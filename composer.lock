@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c61ff82cbf0142a401a48a8161e1595a",
+    "content-hash": "27d32133275f7dcf747a49abc68007f8",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -5693,6 +5693,53 @@
                 "source": "https://github.com/mockery/mockery/tree/1.5.1"
             },
             "time": "2022-09-07T15:32:08+00:00"
+        },
+        {
+            "name": "mrdebug/crudgen",
+            "version": "1.9.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/misterdebug/crud-generator-laravel.git",
+                "reference": "55bc6f97f723cf295cdeb7c4616554af4150c6d6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/misterdebug/crud-generator-laravel/zipball/55bc6f97f723cf295cdeb7c4616554af4150c6d6",
+                "reference": "55bc6f97f723cf295cdeb7c4616554af4150c6d6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Mrdebug\\Crudgen\\CrudgenServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mrdebug\\Crudgen\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Escarem",
+                    "email": "contact@escarem-jonathan.fr"
+                }
+            ],
+            "description": "Create a Laravel Crud in a few seconds",
+            "support": {
+                "issues": "https://github.com/misterdebug/crud-generator-laravel/issues",
+                "source": "https://github.com/misterdebug/crud-generator-laravel/tree/1.9.4"
+            },
+            "time": "2023-01-22T20:10:44+00:00"
         },
         {
             "name": "myclabs/deep-copy",
