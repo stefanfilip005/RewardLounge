@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\ProcessPoints;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('sso/acs.php',function(){
+    echo "ABCD";
+});
+

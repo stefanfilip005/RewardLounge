@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Employee;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -63,19 +64,25 @@ class test extends Command
                 $this->findDateRange($lowestDate,$highestDate,$lines,$colResource,$colType,$colStart,$colEnd,$columnsLength);
                 Shift::where('start','>=',$lowestDate)->where('end','<=',$highestDate)->delete();
     
+                $employees = array();
                 $inserts = array();
                 foreach($lines as $line){
                     $parts = explode(",", $line);
                     if($columnsLength == count($parts)){
                         if(strcmp($parts[$colType],"EA-RKT") == 0){
                             if(strlen($parts[$colResource]) > 0){
+                                $employee = array(
+                                    'remoteId' => $parts[$colEmployeeId]
+                                );
+                                $employees[] = $employee;
+
                                 $start = Carbon::parse($parts[$colStart]);
                                 $end = Carbon::parse($parts[$colEnd]);
                                 $shift = array(
                                     'employeeId' => $parts[$colEmployeeId],
                                     'start' => $start,
                                     'end' => $end,
-                                    'usage' => $parts[$colResource],
+                                    'demandType' => $parts[$colResource],
                                     'location' => $parts[$colLocation]
                                 );
                                 $inserts[] = $shift;
@@ -83,6 +90,7 @@ class test extends Command
                         }
                     }
                 }
+                Employee::upsert($employees,['remoteId']);
                 Shift::insert($inserts);
             }
         }

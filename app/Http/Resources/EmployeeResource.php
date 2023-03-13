@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ShiftResource extends JsonResource
+class EmployeeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,12 +17,13 @@ class ShiftResource extends JsonResource
         //return parent::toArray($request);
         return
         [
-			'employeeId' => $this->employeeId,
-			'start' => $this->start,
-			'end' => $this->end,
-			'demandType' => $this->demandType,
-			'location' => $this->location,
-			'duration' => $this->duration,
+			'remoteId' => $this->remoteId,
+			'firstname' => $this->firstname,
+			'lastname' => $this->lastname,
+			'email' => $this->email,
+			'phone' => $this->phone,
+			'points' => $this->points,
+			'lastPointCalculation' => $this->lastPointCalculation,
         ];
     }
 }

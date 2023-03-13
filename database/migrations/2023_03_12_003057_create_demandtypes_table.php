@@ -4,7 +4,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShiftsTable extends Migration
+class CreateDemandtypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,12 @@ class CreateShiftsTable extends Migration
      */
     public function up()
     {
-        Schema::create('shifts', function (Blueprint $table) {
+        Schema::create('demandtypes', function (Blueprint $table) {
             $table->id();
-			$table->string('employeeId');
-			$table->datetime('start');
-			$table->datetime('end');
-			$table->string('demandType');
-			$table->string('location');
-			$table->decimal('points')->default(0);
-			$table->datetime('lastPointCalculation')->nullable();
+			$table->string('name');
+			$table->string('description');
+			$table->unsignedDecimal('pointsPerMinute');
+			$table->unsignedDecimal('pointsPerShift');
             $table->timestamps();
         });
     }
@@ -33,6 +30,6 @@ class CreateShiftsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shifts');
+        Schema::dropIfExists('demandtypes');
     }
 }
