@@ -30,7 +30,7 @@ return [
     |
     */
 
-    'useRoutes' => true,
+    'useRoutes' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'routesPrefix' => '/saml2',
+    'routesPrefix' => '/sso',
 
     /*
     |--------------------------------------------------------------------------
@@ -182,7 +182,7 @@ return [
         |
         */
 
-        'entityId' => 'https://intern.rkhl.at/sso/metadata.php',//env('SAML2_SP_ENTITYID',''),
+        'entityId' => env('SAML2_SP_ENTITYID',''),
 
         /*
         |--------------------------------------------------------------------------

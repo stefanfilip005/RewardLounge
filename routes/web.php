@@ -1,7 +1,9 @@
 <?php
 
 use App\Jobs\ProcessPoints;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\VarDumper\VarDumper;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +20,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('sso/acs.php',function(){
-    echo "ABCD";
+Route::get('sso/metadata.php',function(Request $request){
+    var_dump($request);
+});
+Route::get('sso/acs.php',function(Request $request){
+    var_dump($request);
+});
+Route::get('sso/sls.php',function(Request $request){
+    var_dump($request);
 });
 
