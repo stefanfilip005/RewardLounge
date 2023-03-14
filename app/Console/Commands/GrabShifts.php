@@ -95,7 +95,7 @@ class GrabShifts extends Command
                                     'start' => Carbon::parse($row['Beginn'], 'Europe/Vienna'),
                                     'end' => Carbon::parse($row['Ende'], 'Europe/Vienna'),
                                     'demandType' => $row['KlassId'],
-                                    'location' => $row['AbteilungBezeichnung']
+                                    'location' => $plan['id_rps']
                                 );
                                 $allShifts[] = $shift;
                             }

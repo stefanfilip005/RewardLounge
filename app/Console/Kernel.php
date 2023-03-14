@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('command:grabShifts')->everySixHours();
+        $schedule->command('command:grabEmployees')->everyFourHours();
     }
 
     /**
