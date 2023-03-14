@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Demandtype;
 use App\Models\Employee;
 use App\Models\Shift;
 use Carbon\Carbon;
@@ -44,6 +45,8 @@ class GrabShifts extends Command
         $employees = array();
         $employeeIds = array();
         $allShifts = array();
+        $demandTypes = array();
+        $demandTypeNames = array();
 
         $apicall = array();
         $apicall['req'] = 'RPS_PLAENE';
@@ -89,6 +92,11 @@ class GrabShifts extends Command
                                     $employees[] = array('remoteId' => $employeeId);
                                     $employeeIds[] = $employeeId;
                                 }
+
+                                if(!in_array($row['KlassId'],$demandTypeNames)){
+                                    $demandTypes[] = array('name' => $row['KlassId']);
+                                    $demandTypeNames[] = $row['KlassId'];
+                                }
                                 
                                 $shift = array(
                                     'employeeId' => $employeeId,
@@ -113,6 +121,7 @@ class GrabShifts extends Command
                     $highestDate = $line['end']->copy();
                 }
             }
+            Demandtype::upsert($demandTypes,['name']);
             Employee::upsert($employees,['remoteId']);
             Shift::where('start','>=',$lowestDate)->where('end','<=',$highestDate)->delete();
             Shift::insert($allShifts);
