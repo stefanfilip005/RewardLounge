@@ -15,7 +15,7 @@ class CreateEmployeesTable extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-			$table->string('remoteId')->unique();
+			$table->unsignedBigInteger('remoteId')->unique();
 			$table->string('firstname')->default("");
 			$table->string('lastname')->default("");
 			$table->string('email')->default("");

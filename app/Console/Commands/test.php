@@ -42,7 +42,8 @@ class test extends Command
      */
     public function handle()
     {
-        echo "XXX \n";
+        echo "Disabled \n";
+        exit;
         $filename = 'Punktesystem_2023.CSV';
         if (Storage::exists($filename)) {
             $contents = Storage::get($filename);

@@ -21,7 +21,7 @@ class GrabShifts extends Command
      *
      * @var string
      */
-    protected $description = 'Collects all shifts in the last 5 days from the NRK API';
+    protected $description = 'Collects all shifts starting yesterday till the last 5 days from the NRK API';
 
     /**
      * Create a new command instance.
@@ -63,7 +63,7 @@ class GrabShifts extends Command
             foreach($plans['data'] as $plan){
                 $apicall['req'] = 'RPS';
                 $apicall['von'] = date('Y-m-d', strtotime('-5 days'));
-                $apicall['bis'] = date("Y-m-d");
+                $apicall['bis'] = date("Y-m-d", strtotime('-1 days'));
                 $apicall['rpsid'] = $plan['id_rps'];
             
                 $ch = curl_init();
