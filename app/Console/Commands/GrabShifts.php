@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Employee;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -112,6 +113,7 @@ class GrabShifts extends Command
                     $highestDate = $line['end']->copy();
                 }
             }
+            Employee::upsert($employees,['remoteId']);
             Shift::where('start','>=',$lowestDate)->where('end','<=',$highestDate)->delete();
             Shift::insert($allShifts);
         }
