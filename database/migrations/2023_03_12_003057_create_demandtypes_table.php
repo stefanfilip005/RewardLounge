@@ -16,9 +16,9 @@ class CreateDemandtypesTable extends Migration
         Schema::create('demandtypes', function (Blueprint $table) {
             $table->id();
 			$table->string('name')->uniqid();
-			$table->string('description');
-			$table->unsignedDecimal('pointsPerMinute');
-			$table->unsignedDecimal('pointsPerShift');
+			$table->string('description')->default("");
+			$table->unsignedDecimal('pointsPerMinute')->default(0);
+			$table->unsignedDecimal('pointsPerShift')->default(0);
             $table->timestamps();
         });
     }
