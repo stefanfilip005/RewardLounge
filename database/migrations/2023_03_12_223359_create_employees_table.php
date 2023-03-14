@@ -18,8 +18,8 @@ class CreateEmployeesTable extends Migration
 			$table->unsignedBigInteger('remoteId')->unique();
 			$table->string('firstname')->default("");
 			$table->string('lastname')->default("");
-			$table->string('email')->default("");
-			$table->string('phone')->default("");
+			$table->string('email')->nullable();
+			$table->string('phone')->nullable();
 			$table->decimal('points')->default(0);
 			$table->datetime('lastPointCalculation')->nullable();
             $table->timestamps();
