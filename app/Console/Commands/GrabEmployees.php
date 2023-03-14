@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 
-class GrabShifts extends Command
+class GrabEmployees extends Command
 {
     /**
      * The name and signature of the console command.
