@@ -22,7 +22,8 @@ class ShiftResource extends JsonResource
 			'end' => $this->end,
 			'demandType' => $this->demandType,
 			'location' => $this->location,
-			'duration' => $this->duration,
+			'points' => $this->points,
+			'lastPointCalculation' => $this->lastPointCalculation,
         ];
     }
 }
