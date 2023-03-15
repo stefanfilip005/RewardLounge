@@ -23,23 +23,6 @@ class DemandtypesController extends Controller
     }
 
     /**
-     * Display a listing of all distinct demandtypes
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function demandtypesInUse()
-    {
-        $types = DB::table('shifts')->groupBy('demandType')->select('demandType')->get();
-        $demandTypes = array();
-        foreach($types as $type){
-            $demandTypes[] = $type->demandType;
-        }
-        return response()->json(["data" => $demandTypes], 200);
-    }
-    
-
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  DemandtypeRequest  $request
