@@ -58,8 +58,9 @@ Route::get('/test', [LoginController::class, 'index']);
 Route::apiResource("rewards", RewardsController::class);
 Route::apiResource("demandtypes", DemandtypesController::class);
 Route::apiResource("shifts", ShiftsController::class);
-Route::apiResource("employees", EmployeesController::class);
 
+
+Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
 
 
 /*
