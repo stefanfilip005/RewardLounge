@@ -42,8 +42,6 @@ class test extends Command
      */
     public function handle()
     {
-        echo "Disabled \n";
-        exit;
         $filename = 'Punktesystem_2023.CSV';
         if (Storage::exists($filename)) {
             $contents = Storage::get($filename);
@@ -72,19 +70,20 @@ class test extends Command
                     if($columnsLength == count($parts)){
                         if(strcmp($parts[$colType],"EA-RKT") == 0){
                             if(strlen($parts[$colResource]) > 0){
+                                $employeeId = ltrim(substr($parts[$colEmployeeId], 1), '0');
                                 $employee = array(
-                                    'remoteId' => $parts[$colEmployeeId]
+                                    'remoteId' => $employeeId
                                 );
                                 $employees[] = $employee;
 
                                 $start = Carbon::parse($parts[$colStart]);
                                 $end = Carbon::parse($parts[$colEnd]);
                                 $shift = array(
-                                    'employeeId' => $parts[$colEmployeeId],
+                                    'employeeId' => $employeeId,
                                     'start' => $start,
                                     'end' => $end,
                                     'demandType' => $parts[$colResource],
-                                    'location' => $parts[$colLocation]
+                                    'location' => ($parts[$colLocation] == "Hollabrunn") ? 38 : 39
                                 );
                                 $inserts[] = $shift;
                             }
