@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\DemandtypesController;
+use App\Http\Controllers\API\EmployeesController;
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
@@ -23,7 +24,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::apiResource("rewards", RewardsController::class);
 
 
 
@@ -51,21 +51,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+
 Route::get('/test', [LoginController::class, 'index']);
 
-
+Route::apiResource("rewards", RewardsController::class);
 Route::apiResource("demandtypes", DemandtypesController::class);
 Route::apiResource("shifts", ShiftsController::class);
-
-
-Route::get('/demandtypesInUse', [DemandtypesController::class, 'demandtypesInUse']);
+Route::apiResource("employees", EmployeesController::class);
 
 
 
+/*
 Route::get('startPointsCalculation',function(Request $request){
     $employee = Employee::find(40);
     ProcessPoints::dispatchAfterResponse($employee);
 });
+*/
 
 
 Route::get('startPointsCalculationForAllEmployees',function(Request $request){
