@@ -18,26 +18,8 @@ class DemandtypesController extends Controller
      */
     public function index()
     {
-        $demandtypes = Demandtype::paginate(15);
+        $demandtypes = Demandtype::orderBy('shiftType','asc')->orderBy('name','asc')->paginate(50);
         return DemandtypeResource::collection($demandtypes);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  DemandtypeRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(DemandtypeRequest $request)
-    {
-        $demandtype = new Demandtype;
-		$demandtype->name = $request->input('name');
-		$demandtype->description = $request->input('description');
-		$demandtype->pointsPerMinute = $request->input('pointsPerMinute');
-		$demandtype->pointsPerShift = $request->input('pointsPerShift');
-        $demandtype->save();
-
-        return response()->json($demandtype, 201);
     }
 
     /**
@@ -63,6 +45,7 @@ class DemandtypesController extends Controller
     {
         $demandtype = Demandtype::findOrFail($id);
 		$demandtype->name = $request->input('name');
+		$demandtype->shiftType = $request->input('shiftType');
 		$demandtype->description = $request->input('description');
 		$demandtype->pointsPerMinute = $request->input('pointsPerMinute');
 		$demandtype->pointsPerShift = $request->input('pointsPerShift');
@@ -71,17 +54,4 @@ class DemandtypesController extends Controller
         return response()->json($demandtype);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $demandtype = Demandtype::findOrFail($id);
-        $demandtype->delete();
-
-        return response()->json(null, 204);
-    }
 }

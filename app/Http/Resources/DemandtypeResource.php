@@ -19,6 +19,7 @@ class DemandtypeResource extends JsonResource
         [
 			'id' => $this->id,
 			'name' => $this->name,
+			'shiftType' => $this->shiftType,
 			'description' => $this->description,
 			'pointsPerMinute' => $this->pointsPerMinute,
 			'pointsPerShift' => $this->pointsPerShift,

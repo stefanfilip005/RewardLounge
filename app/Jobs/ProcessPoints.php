@@ -40,9 +40,9 @@ class ProcessPoints implements ShouldQueue
     public function handle()
     {
         $defaultRatingMap = array();
-        $ratings = Demandtype::select('name','pointsPerMinute','pointsPerShift')->get();
+        $ratings = Demandtype::select('name','shiftType','pointsPerMinute','pointsPerShift')->get();
         foreach($ratings as $rating){
-            $defaultRatingMap[$rating->name] = ['pointsPerMinute' => $rating->pointsPerMinute, 'pointsPerShift' => $rating->pointsPerShift];
+            $defaultRatingMap[$rating->name . '_X_' . $rating->shiftType] = ['pointsPerMinute' => $rating->pointsPerMinute, 'pointsPerShift' => $rating->pointsPerShift];
         }
 
         /*
@@ -81,11 +81,11 @@ class ProcessPoints implements ShouldQueue
                     }
                 }
             }
-            if(isset($defaultRatingMap[$shift->demandType])){
-                $pointsForThisShift = ($durationInMinutes * $defaultRatingMap[$shift->demandType]['pointsPerMinute']) + $defaultRatingMap[$shift->demandType]['pointsPerShift'];
+            if(isset($defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType])){
+                $pointsForThisShift = ($durationInMinutes * $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerMinute']) + $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerShift'];
                 $points += $pointsForThisShift;
             }
-            $shiftUpserts[] = ['id' => $shift->id, 'employeeId' => $shift->employeeId, 'start' => $shift->start, 'end' => $shift->end, 'demandType' => $shift->demandType, 'location' => $shift->location, 'points' => $pointsForThisShift, 'lastPointCalculation' => Carbon::now()];
+            $shiftUpserts[] = ['id' => $shift->id, 'employeeId' => $shift->employeeId, 'start' => $shift->start, 'end' => $shift->end, 'demandType' => $shift->demandType,'shiftType' => $shift->shiftType, 'location' => $shift->location, 'points' => $pointsForThisShift, 'lastPointCalculation' => Carbon::now()];
         }
         Employee::where('remoteId',$this->employeeId)->update(['points' => $points, 'lastPointCalculation' => Carbon::now()]);
         Shift::upsert($shiftUpserts,['id'],['points', 'lastPointCalculation']);

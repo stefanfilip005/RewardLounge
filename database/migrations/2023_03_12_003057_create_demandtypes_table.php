@@ -15,11 +15,14 @@ class CreateDemandtypesTable extends Migration
     {
         Schema::create('demandtypes', function (Blueprint $table) {
             $table->id();
-			$table->string('name')->unique();
+			$table->string('name');
+			$table->string('shiftType');
 			$table->string('description')->default("");
 			$table->unsignedDecimal('pointsPerMinute')->default(0);
 			$table->unsignedDecimal('pointsPerShift')->default(0);
             $table->timestamps();
+
+            $table->unique(['name', 'shiftType']);
         });
     }
 

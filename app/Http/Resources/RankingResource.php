@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ShiftResource extends JsonResource
+class RankingResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,14 +17,11 @@ class ShiftResource extends JsonResource
         //return parent::toArray($request);
         return
         [
-			'employeeId' => $this->employeeId,
-			'start' => $this->start,
-			'end' => $this->end,
-			'demandType' => $this->demandType,
-			'location' => $this->location,
-			'shiftType' => $this->shiftType,
+			'remoteId' => $this->remoteId,
+			'year' => $this->year,
+			'place' => $this->place,
 			'points' => $this->points,
-			'lastPointCalculation' => $this->lastPointCalculation,
+			'pointsForNext' => $this->pointsForNext
         ];
     }
 }

@@ -28,6 +28,7 @@ class DemandtypeRequest extends FormRequest
         return
         [
 			'name' => 'required',
+			'shiftType' => 'required',
 			'description' => 'required',
 			'pointsPerMinute' => 'required',
 			'pointsPerShift' => 'required',

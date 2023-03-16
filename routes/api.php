@@ -60,7 +60,15 @@ Route::apiResource("demandtypes", DemandtypesController::class);
 Route::apiResource("shifts", ShiftsController::class);
 
 
+
+
 Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
+
+
+Route::prefix('self')->group(function () {
+    Route::get("ranking", [EmployeesController::class, 'selfRanking']);
+    Route::get("shifts", [EmployeesController::class, 'selfShifts']);
+});
 
 
 /*

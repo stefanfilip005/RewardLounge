@@ -93,7 +93,7 @@ class GrabShifts extends Command
                                 }
 
                                 if(!in_array($row['KlassId'],$demandTypeNames)){
-                                    $demandTypes[] = array('name' => $row['KlassId']);
+                                    $demandTypes[] = array('name' => $row['KlassId'],'shiftType' => $row['DienstartBeschreibung']);
                                     $demandTypeNames[] = $row['KlassId'];
                                 }
                                 
@@ -120,7 +120,7 @@ class GrabShifts extends Command
                     $highestDate = $line['end']->copy();
                 }
             }
-            Demandtype::upsert($demandTypes,['name']);
+            Demandtype::upsert($demandTypes,['name','shiftType']);
             Employee::upsert($employees,['remoteId']);
             Shift::where('start','>=',$lowestDate)->where('end','<=',$highestDate)->delete();
             Shift::insert($allShifts);
