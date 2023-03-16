@@ -80,6 +80,7 @@ class test extends Command
                                 $end = Carbon::parse($parts[$colEnd]);
                                 $shift = array(
                                     'employeeId' => $employeeId,
+                                    'shiftType' => "EA-RKT",
                                     'start' => $start,
                                     'end' => $end,
                                     'demandType' => $parts[$colResource],
