@@ -19,6 +19,7 @@ class CreateShiftsTable extends Migration
 			$table->datetime('start');
 			$table->datetime('end');
 			$table->string('demandType');
+			$table->string('shiftType');
 			$table->unsignedBigInteger('location');
 			$table->decimal('points')->default(0);
 			$table->datetime('lastPointCalculation')->nullable();

@@ -84,7 +84,6 @@ class GrabShifts extends Command
                 $shiftData = json_decode($return, true);
                 if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
                     foreach($shiftData['data']['plan'] as $row){
-                        if(strcmp("EA-RKT",$row['DienstartBeschreibung']) == 0){
                             if(strlen($row['ObjektId']) > 1){
                                 $employeeId = ltrim(substr($row['ObjektId'], 1), '0');
 
@@ -103,11 +102,11 @@ class GrabShifts extends Command
                                     'start' => Carbon::parse($row['Beginn'], 'Europe/Vienna'),
                                     'end' => Carbon::parse($row['Ende'], 'Europe/Vienna'),
                                     'demandType' => $row['KlassId'],
+                                    'shiftType' => $row['DienstartBeschreibung'],
                                     'location' => $plan['id_rps']
                                 );
                                 $allShifts[] = $shift;
                             }
-                        }
                     }
                 }
             }
