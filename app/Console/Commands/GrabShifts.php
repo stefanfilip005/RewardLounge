@@ -66,7 +66,7 @@ class GrabShifts extends Command
         if(isset($plans['data'])){
             foreach($plans['data'] as $plan){
                 $apicall['req'] = 'RPS';
-                $apicall['von'] = date('Y-m-d', strtotime('-5 days'));
+                $apicall['von'] = date('Y-m-d', strtotime('-14 days'));
                 $apicall['bis'] = date("Y-m-d", strtotime('-1 days'));
                 $apicall['rpsid'] = $plan['id_rps'];
             
@@ -92,9 +92,9 @@ class GrabShifts extends Command
                                     $employeeIds[] = $employeeId;
                                 }
 
-                                if(!in_array($row['KlassId'],$demandTypeNames)){
+                                if(!in_array($row['KlassId'] . '_X_' . $row['DienstartBeschreibung'],$demandTypeNames)){
                                     $demandTypes[] = array('name' => $row['KlassId'],'shiftType' => $row['DienstartBeschreibung']);
-                                    $demandTypeNames[] = $row['KlassId'];
+                                    $demandTypeNames[] = $row['KlassId'] . '_X_' . $row['DienstartBeschreibung'];
                                 }
                                 
                                 $shift = array(
