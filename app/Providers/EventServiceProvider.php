@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
@@ -29,18 +30,13 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
         Event::listen(\Slides\Saml2\Events\SignedIn::class, function (\Slides\Saml2\Events\SignedIn $event) {
-            $messageId = $event->auth->getLastMessageId();
-            // your own code preventing reuse of a $messageId to stop replay attacks
+            //$messageId = $event->auth->getLastMessageId();
             $samlUser = $event->auth->getSaml2User();
-            $userData = [
-                'id' => $samlUser->getUserId(),
-                'attributes' => $samlUser->getAttributes(),
-                'assertion' => $samlUser->getRawSamlAssertion()
-            ];
-            dd($userData);
-            // Login a user.
+            $attributes = $samlUser->getAttributes();
+            if($employee = Employee::where('remoteId',$attributes['mnr'][0])->first()){
+                return redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken);
+            }
             exit;
         });
-
     }
 }

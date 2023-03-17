@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\ProcessPoints;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\VarDumper\VarDumper;
@@ -17,16 +18,6 @@ use Symfony\Component\VarDumper\VarDumper;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    echo "Backend running";
+    exit;
 });
-
-Route::get('sso/metadata.php',function(Request $request){
-    var_dump($request);
-});
-Route::get('sso/acs.php',function(Request $request){
-    var_dump($request);
-});
-Route::get('sso/sls.php',function(Request $request){
-    var_dump($request);
-});
-

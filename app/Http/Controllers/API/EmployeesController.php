@@ -51,6 +51,9 @@ class EmployeesController extends Controller
         return new EmployeeResource($employee);
     }
 
+    public function userProfile(Request $request){
+        return EmployeeResource::make($request->user());
+    }
 
     public function selfRanking(Request $request){
         $remoteId = 116931;

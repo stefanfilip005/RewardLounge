@@ -8,7 +8,6 @@ use App\Http\Controllers\API\ShiftsController;
 use App\Jobs\ProcessPoints;
 use App\Models\Demandtype;
 use App\Models\Employee;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -26,48 +25,27 @@ use Illuminate\Support\Facades\Route;
 
 
 
-
-Route::post('login',function(Request $request){
-    $email = "stefan.filip.005@gmail.com";
-    $user = User::where('email',$email)->first();
-    if($user == null){
-        $user = new User();
-        $user->name = "Stefan Filip";
-        $user->email = $email;
-        $user->password = bcrypt("abcd");
-        $user->save();
-    }
-    Auth::login($user);
-
-    return response()->json([
-        'status' => true,
-        'message' => 'User Logged In Successfully',
-        'token' => $user->createToken("API TOKEN")->plainTextToken
-    ], 200);
-
-})->name('login');;
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('login',function(Request $request){ return redirect('https://intern.rkhl.at/saml2/2209a842-3461-4241-968a-2d950ea35237/login'); })->name('login');;
 
 
 
-Route::get('/test', [LoginController::class, 'index']);
 
 Route::apiResource("rewards", RewardsController::class);
 Route::apiResource("demandtypes", DemandtypesController::class);
 Route::apiResource("shifts", ShiftsController::class);
-
-
-
-
 Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
 
 
-Route::prefix('self')->group(function () {
+
+
+
+Route::middleware('auth:sanctum')->prefix('self')->group(function () {
+    Route::get("user-profile", [EmployeesController::class, 'userProfile']);
     Route::get("ranking", [EmployeesController::class, 'selfRanking']);
     Route::get("shifts", [EmployeesController::class, 'selfShifts']);
+
+
+    
 });
 
 

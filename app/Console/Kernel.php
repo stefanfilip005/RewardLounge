@@ -15,9 +15,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('sanctum:prune-expired --hours=12')->daily();
+
         // $schedule->command('inspire')->hourly();
-        $schedule->command('command:grabShifts')->everySixHours();
-        $schedule->command('command:grabEmployees')->everyFourHours();
+        $schedule->command('command:grabEmployees')->dailyAt('02:05');
+        $schedule->command('command:grabShifts')->dailyAt('02:10');
+
+        // ToDo -- There need to run the points calculation in between
+        $schedule->command('command:calculateRanking')->dailyAt('02:15');
+
     }
 
     /**

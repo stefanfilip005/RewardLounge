@@ -10,21 +10,21 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use stdClass;
 
-class statistic extends Command
+class CalculateRanking extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:statistic';
+    protected $signature = 'command:calculateRanking';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Calculates the ranking based on the points';
 
     /**
      * Create a new command instance.
