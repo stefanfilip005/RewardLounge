@@ -22,6 +22,12 @@ class CreateEmployeesTable extends Migration
 			$table->string('phone')->nullable();
 			$table->decimal('points')->default(0);
 			$table->datetime('lastPointCalculation')->nullable();
+
+			$table->boolean('isAdministrator')->default(false);
+			$table->boolean('isModerator')->default(false);
+			$table->boolean('isDeveloper')->default(false);
+			$table->boolean('showNameInRanking')->default(false);
+
             $table->timestamps();
         });
     }

@@ -20,9 +20,9 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('command:grabEmployees')->dailyAt('02:05');
         $schedule->command('command:grabShifts')->dailyAt('02:10');
-
-        // ToDo -- There need to run the points calculation in between
-        $schedule->command('command:calculateRanking')->dailyAt('02:15');
+        $schedule->command('command:calculatePoints')->dailyAt('02:15');
+        $schedule->command('command:calculateRanking')->dailyAt('02:25');
+        $schedule->command('command:calculateRankingDistribution')->dailyAt('02:30');
 
     }
 

@@ -8,9 +8,11 @@ use App\Models\Employee;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\RankingResource;
+use App\Http\Resources\RankingDistributionResource;
 use App\Http\Resources\ShiftResource;
 use App\Models\Ranking;
 use App\Models\Shift;
+use App\Models\RankingDistribution;
 use Illuminate\Http\Request;
 
 class EmployeesController extends Controller
@@ -39,6 +41,13 @@ class EmployeesController extends Controller
         return EmployeeResource::collection($employees);
     }
 
+    public function teamEmployees(Request $request)
+    {
+        $employees = Employee::where('isAdministrator',true)->orWhere('isModerator',true)->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->select('email','firstname','lastname','isAdministrator','isModerator')->paginate(500);
+        return EmployeeResource::collection($employees);
+    }
+
+
     /**
      * Display the specified resource.
      *
@@ -56,10 +65,9 @@ class EmployeesController extends Controller
     }
 
     public function selfRanking(Request $request){
-        $remoteId = 116931;
         $year = 2023;
-        if(Ranking::where('year',$year)->where('remoteId',$remoteId)->exists()){
-            $ranking = Ranking::where('year',$year)->where('remoteId',$remoteId)->first();
+        if(Ranking::where('year',$year)->where('remoteId',$request->user()->remoteId)->exists()){
+            $ranking = Ranking::where('year',$year)->where('remoteId',$request->user()->remoteId)->first();
         }else{
             $ranking = Ranking::where('year',$year)->orderBy('place','desc')->first();
             $ranking->place = $ranking->place + 1;
@@ -69,9 +77,16 @@ class EmployeesController extends Controller
         return RankingResource::make($ranking);
     }
     public function selfShifts(Request $request){
-        $remoteId = 116931;
-        $shifts = Shift::where('employeeId',$remoteId)->orderBy('start','asc')->paginate(15);
+        $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','asc')->paginate(15);
         return ShiftResource::collection($shifts);
     }
+
+    public function rankingDistribution(Request $request){
+        $year = 2023;
+        $rankingDistribution = RankingDistribution::where('year',$year)->orderBy('limit','asc')->get();
+        return RankingDistributionResource::collection($rankingDistribution);
+    }
+
+    
 
 }

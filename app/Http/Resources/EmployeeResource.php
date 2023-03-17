@@ -24,6 +24,11 @@ class EmployeeResource extends JsonResource
 			'phone' => $this->phone,
 			'points' => $this->points,
 			'lastPointCalculation' => $this->lastPointCalculation,
+
+			'isAdministrator' => $this->isAdministrator,
+			'isModerator' => $this->isModerator,
+			'isDeveloper' => $this->isDeveloper,
+			'showNameInRanking' => $this->showNameInRanking,
         ];
     }
 }
