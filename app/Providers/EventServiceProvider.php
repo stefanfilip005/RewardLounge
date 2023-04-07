@@ -34,9 +34,24 @@ class EventServiceProvider extends ServiceProvider
             $messageId = $event->auth->getLastMessageId();
             $samlUser = $event->auth->getSaml2User();
             $attributes = $samlUser->getAttributes();
-            if($employee = Employee::where('remoteId',$attributes['mnr'][0])->first()){
-                abort(redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken));
-				exit;
+
+            if(isset($attributes['username']) && is_array($attributes['username']) && str_starts_with($attributes['username'][0],'n')){
+                if($employee = Employee::where('remoteId',substr($attributes['username'][0],1))->first()){
+                    abort(redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken));
+                    exit;
+                }
+            }
+            if(isset($attributes['mail']) && is_array($attributes['mail'])){
+                if($employee = Employee::where('email',$attributes['mail'][0])->first()){
+                    abort(redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken));
+                    exit;
+                }
+            }
+            if(isset($attributes['mnr']) && is_array($attributes['mnr'])){
+                if($employee = Employee::where('remoteId',$attributes['mnr'][0])->first()){
+                    abort(redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken));
+                    exit;
+                }
             }
             abort(redirect('https://intern.rkhl.at'));
 			exit;
