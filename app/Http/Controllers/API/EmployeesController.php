@@ -28,14 +28,18 @@ class EmployeesController extends Controller
         if($request->filled('hasPoints')){
             if($request->sortMode == 0){
                 $employees = Employee::where('points','>',0)->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+            }else if($request->sortMode == 1){
+                $employees = Employee::where('points','>',0)->orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }else{
-                $employees = Employee::where('points','>',0)->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::where('points','>',0)->orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }
         }else{
             if($request->sortMode == 0){
                 $employees = Employee::orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+            }else if($request->sortMode == 1){
+                $employees = Employee::orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }else{
-                $employees = Employee::orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }
         }
         return EmployeeResource::collection($employees);
