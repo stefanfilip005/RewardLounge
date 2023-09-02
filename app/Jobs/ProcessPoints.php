@@ -56,6 +56,7 @@ class ProcessPoints implements ShouldQueue
         */
 
         $points = 0;
+        $shiftCounter = 0;
         $shiftUpserts = array();
         $shifts = Shift::where('employeeId',$this->employeeId)->get();
         foreach($shifts as $shift){
@@ -83,11 +84,14 @@ class ProcessPoints implements ShouldQueue
             }
             if(isset($defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType])){
                 $pointsForThisShift = ($durationInMinutes * $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerMinute']) + $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerShift'];
+                if($pointsForThisShift > 0){
+                    $shiftCounter++;
+                }
                 $points += $pointsForThisShift;
             }
             $shiftUpserts[] = ['id' => $shift->id, 'employeeId' => $shift->employeeId, 'start' => $shift->start, 'end' => $shift->end, 'demandType' => $shift->demandType,'shiftType' => $shift->shiftType, 'location' => $shift->location, 'points' => $pointsForThisShift, 'lastPointCalculation' => Carbon::now()];
         }
-        Employee::where('remoteId',$this->employeeId)->update(['points' => $points, 'lastPointCalculation' => Carbon::now()]);
+        Employee::where('remoteId',$this->employeeId)->update(['points' => $points, 'shifts' => $shiftCounter, 'lastPointCalculation' => Carbon::now()]);
         Shift::upsert($shiftUpserts,['id'],['points', 'lastPointCalculation']);
     }
 }

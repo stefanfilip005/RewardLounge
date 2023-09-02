@@ -16,7 +16,7 @@ class ShiftsController extends Controller
      */
     public function index()
     {
-        $shifts = Shift::orderBy('start','asc')->paginate(15);
+        $shifts = Shift::orderBy('start','asc')->paginate(50);
         return ShiftResource::collection($shifts);
     }
 

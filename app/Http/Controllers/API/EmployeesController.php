@@ -27,15 +27,15 @@ class EmployeesController extends Controller
         $employees = [];
         if($request->filled('hasPoints')){
             if($request->sortMode == 0){
-                $employees = Employee::where('points','>',0)->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(50);
+                $employees = Employee::where('points','>',0)->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }else{
-                $employees = Employee::where('points','>',0)->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(50);
+                $employees = Employee::where('points','>',0)->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }
         }else{
             if($request->sortMode == 0){
-                $employees = Employee::orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(50);
+                $employees = Employee::orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }else{
-                $employees = Employee::orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(50);
+                $employees = Employee::orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
             }
         }
         return EmployeeResource::collection($employees);
@@ -77,7 +77,7 @@ class EmployeesController extends Controller
         return RankingResource::make($ranking);
     }
     public function selfShifts(Request $request){
-        $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','asc')->paginate(15);
+        $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','asc')->paginate(50);
         return ShiftResource::collection($shifts);
     }
 
