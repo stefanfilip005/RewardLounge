@@ -18,7 +18,7 @@ class DemandtypesController extends Controller
      */
     public function index()
     {
-        $demandtypes = Demandtype::orderBy('shiftType','asc')->orderBy('name','asc')->paginate(50);
+        $demandtypes = Demandtype::orderBy('shiftType','asc')->orderBy('name','asc')->paginate(5000);
         return DemandtypeResource::collection($demandtypes);
     }
 

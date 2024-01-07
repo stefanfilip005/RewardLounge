@@ -81,7 +81,7 @@ class EmployeesController extends Controller
         return RankingResource::make($ranking);
     }
     public function selfShifts(Request $request){
-        $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','asc')->paginate(50);
+        $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','asc')->paginate(5000);
         return ShiftResource::collection($shifts);
     }
 
