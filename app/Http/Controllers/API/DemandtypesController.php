@@ -20,10 +20,13 @@ class DemandtypesController extends Controller
     {
         $demandtypes = Demandtype::where('name', 'not like', '%_AMB')
             ->where('name', 'not like', 'KFZ%')
+            ->where('name', 'not like', 'MA')
+            ->where('name', 'not like', 'KI%')
             ->where('shiftType', 'not like', 'HA%')
             ->where('shiftType', 'not like', 'FSJ%')
             ->where('shiftType', 'not like', 'ZD%')
-            ->where('shiftType', 'not like', 'MA')
+            ->where('shiftType', 'not like', 'EX-RKT')
+            ->where('shiftType', 'not like', 'EA-GSD')
             ->orderBy('shiftType','asc')->orderBy('name','asc')->paginate(5000);
         return DemandtypeResource::collection($demandtypes);
     }
