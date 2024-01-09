@@ -58,6 +58,7 @@ class DemandtypesController extends Controller
 		$demandtype->description = $request->input('description');
 		$demandtype->pointsPerMinute = $request->input('pointsPerMinute');
 		$demandtype->pointsPerShift = $request->input('pointsPerShift');
+		$demandtype->useMultiplicator = $request->input('useMultiplicator');
         $demandtype->save();
 
         return response()->json($demandtype);

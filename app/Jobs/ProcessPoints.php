@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Demandtype;
 use App\Models\Employee;
+use App\Models\Multiplication;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -40,10 +41,22 @@ class ProcessPoints implements ShouldQueue
     public function handle()
     {
         $defaultRatingMap = array();
-        $ratings = Demandtype::select('name','shiftType','pointsPerMinute','pointsPerShift')->get();
+        $ratings = Demandtype::select('name','shiftType','pointsPerMinute','pointsPerShift','useMultiplicator')->get();
         foreach($ratings as $rating){
-            $defaultRatingMap[$rating->name . '_X_' . $rating->shiftType] = ['pointsPerMinute' => $rating->pointsPerMinute, 'pointsPerShift' => $rating->pointsPerShift];
+            $defaultRatingMap[$rating->name . '_X_' . $rating->shiftType] = ['pointsPerMinute' => $rating->pointsPerMinute, 'pointsPerShift' => $rating->pointsPerShift, 'useMultiplicator' => $rating->useMultiplicator];
         }
+
+        //ToDo : if we have multiple Multiplications with (from/to), then we can not take the first
+        $defaultMultiplicationMap = array();
+        $multiplications = Multiplication::get();
+        foreach($multiplications as $multiplication){
+            for ($hour = 0; $hour < 24; $hour++) {
+                $hourKey = str_pad($hour, 2, '0', STR_PAD_LEFT);
+                $columnName = 'hour_' . $hourKey;
+                $defaultMultiplicationMap[$hourKey] = $multiplication->$columnName;
+            }
+        }
+
 
         /*
         $ratings = array();
@@ -83,7 +96,13 @@ class ProcessPoints implements ShouldQueue
                 }
             }
             if(isset($defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType])){
-                $pointsForThisShift = ($durationInMinutes * $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerMinute']) + $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerShift'];
+                $pointsPerShiftWithoutMultiplication = ($durationInMinutes * $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerMinute']) + $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerShift'];
+                if($defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['useMultiplicator']){
+                    $pointsForThisShift = $defaultMultiplicationMap[$shiftStart->format('H')] * $pointsPerShiftWithoutMultiplication;
+                }else{
+                    $pointsForThisShift = $pointsPerShiftWithoutMultiplication;
+                }
+
                 if($pointsForThisShift > 0){
                     $shiftCounter++;
                 }

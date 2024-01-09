@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\DemandtypesController;
 use App\Http\Controllers\API\EmployeesController;
 use App\Http\Controllers\API\LoginController;
+use App\Http\Controllers\API\MultiplicationController;
 use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
 use App\Jobs\ProcessPoints;
@@ -42,6 +43,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']); // ToDo - restrict only for admins
     Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get("rankingDistribution", [EmployeesController::class, 'rankingDistribution']);
+
+
+    Route::prefix('multiplications')->group(function () {
+        Route::get('/', [MultiplicationController::class, 'index']);
+        Route::get('/{id}', [MultiplicationController::class, 'show']);
+        Route::post('/', [MultiplicationController::class, 'store']);
+        Route::put('/{id}', [MultiplicationController::class, 'update']);
+        Route::delete('/{id}', [MultiplicationController::class, 'destroy']);
+    });
+
 });
 
 Route::get('startPointsCalculationForAllEmployees',function(Request $request){

@@ -23,6 +23,7 @@ class DemandtypeResource extends JsonResource
 			'description' => $this->description,
 			'pointsPerMinute' => $this->pointsPerMinute,
 			'pointsPerShift' => $this->pointsPerShift,
+			'useMultiplicator' => $this->useMultiplicator,
         ];
     }
 }
