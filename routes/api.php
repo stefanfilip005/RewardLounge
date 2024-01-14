@@ -36,6 +36,9 @@ Route::middleware('auth:sanctum')->prefix('self')->group(function () {
     Route::get("user-profile", [EmployeesController::class, 'userProfile']);
     Route::get("ranking", [EmployeesController::class, 'selfRanking']);
     Route::get("shifts", [EmployeesController::class, 'selfShifts']);
+
+    Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
+    Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -43,6 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']); // ToDo - restrict only for admins
     Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get("rankingDistribution", [EmployeesController::class, 'rankingDistribution']);
+    
+    Route::get("shifts", [EmployeesController::class, 'shifts']);
 
 
     Route::prefix('multiplications')->group(function () {

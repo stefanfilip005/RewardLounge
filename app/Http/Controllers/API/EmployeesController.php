@@ -10,6 +10,7 @@ use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\RankingResource;
 use App\Http\Resources\RankingDistributionResource;
 use App\Http\Resources\ShiftResource;
+use App\Http\Resources\StatisticShiftResource;
 use App\Models\Ranking;
 use App\Models\Shift;
 use App\Models\RankingDistribution;
@@ -27,19 +28,19 @@ class EmployeesController extends Controller
         $employees = [];
         if($request->filled('hasPoints')){
             if($request->sortMode == 0){
-                $employees = Employee::where('points','>',0)->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::where('points','>',0)->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
             }else if($request->sortMode == 1){
-                $employees = Employee::where('points','>',0)->orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::where('points','>',0)->orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
             }else{
-                $employees = Employee::where('points','>',0)->orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::where('points','>',0)->orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
             }
         }else{
             if($request->sortMode == 0){
-                $employees = Employee::orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
             }else if($request->sortMode == 1){
-                $employees = Employee::orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
             }else{
-                $employees = Employee::orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(500);
+                $employees = Employee::orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
             }
         }
         return EmployeeResource::collection($employees);
@@ -81,9 +82,45 @@ class EmployeesController extends Controller
         return RankingResource::make($ranking);
     }
     public function selfShifts(Request $request){
-        $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','asc')->paginate(5000);
+        if(isset($request->year)) {
+            $year = $request->year;
+            $shifts = Shift::where('employeeId',$request->user()->remoteId)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
+            //$shifts = Shift::where('employeeId',228242)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
+        }
         return ShiftResource::collection($shifts);
     }
+
+
+    public function latestShifts(Request $request){
+        $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','desc')->paginate(25);
+        return ShiftResource::collection($shifts);
+    }
+
+
+    public function shifts(Request $request){
+        $shifts = null;
+        if(isset($request->year)) {
+            $year = $request->year;
+            $shifts = Shift::whereIn('location',[38,39])
+                ->whereYear('start', $year)
+                ->where('demandType', 'NOT LIKE', 'KFZ%')
+                ->get();
+        }
+        return ShiftResource::collection($shifts);
+    }
+    public function shiftStatistics(Request $request){
+        $shifts = null;
+        if(isset($request->year)) {
+            $year = $request->year;
+            $shifts = Shift::whereIn('location',[38,39])
+                ->whereYear('start', $year)
+                ->where('demandType', 'NOT LIKE', 'KFZ%')
+                ->get();
+        }
+        return StatisticShiftResource::collection($shifts);
+    }
+    
+    
 
     public function rankingDistribution(Request $request){
         $year = 2023;
