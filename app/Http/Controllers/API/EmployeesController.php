@@ -89,7 +89,7 @@ class EmployeesController extends Controller
         }
         return ShiftResource::collection($shifts);
     }
-    public function selfFutureShifts(Request $request){
+    public function futureShifts(Request $request){
         $apicall = array();
         $apicall['req'] = 'GETNextDienste';
         $apicall['mnr'] = $request->user()->remoteId;

@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->prefix('self')->group(function () {
     Route::get("shifts", [EmployeesController::class, 'selfShifts']);
 
     Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
-    Route::get("selfFutureShifts", [EmployeesController::class, 'selfFutureShifts']);
+    Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
     
 
     Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
