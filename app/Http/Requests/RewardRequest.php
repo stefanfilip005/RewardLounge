@@ -27,15 +27,10 @@ class RewardRequest extends FormRequest
     {
         return
         [
-			'name' => 'required',
-			'description' => 'required',
-			'description2' => 'required',
-			'src2' => 'required',
-			'src3' => 'required',
-			'price' => 'required',
-			'unsignedinteger' => 'required',
-			'valid_from' => 'required',
-			'valid_to' => 'required',
+			'name' => 'required|max:128',
+			'slogan' => 'max:256',
+			'src1' => 'required',
+			'points' => 'required',
         ];
     }
 

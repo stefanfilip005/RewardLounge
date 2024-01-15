@@ -15,15 +15,21 @@ class CreateRewardsTable extends Migration
     {
         Schema::create('rewards', function (Blueprint $table) {
             $table->id();
+
 			$table->string('name');
-			$table->string('description');
-			$table->string('description2');
-			$table->string('src2');
-			$table->string('src3');
-			$table->string('price');
-			$table->string('unsignedinteger');
+			$table->string('slogan');
+			$table->text('description')->nullable();
+			$table->string('src1')->nullable();
+			$table->string('src2')->nullable();
+			$table->string('src3')->nullable();
+			$table->unsignedInteger('points');
+			$table->unsignedInteger('euro')->nullable();
+
+			$table->unsignedInteger('quantity')->nullable();
+
 			$table->date('valid_from');
-			$table->date('valid_to');
+			$table->date('valid_to')->nullable();
+
             $table->timestamps();
         });
     }

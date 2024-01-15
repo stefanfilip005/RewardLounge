@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::get("shifts", [EmployeesController::class, 'shifts']);
 
+    Route::apiResource("rewards", RewardsController::class);
 
     Route::prefix('multiplications')->group(function () {
         Route::get('/', [MultiplicationController::class, 'index']);
@@ -208,6 +209,5 @@ Route::get('startRankingCalculation',function(Request $request){
 
 });
 /*
-Route::apiResource("rewards", RewardsController::class);
 Route::apiResource("shifts", ShiftsController::class);
 */

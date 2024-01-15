@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Reward;
 use App\Http\Requests\RewardRequest;
 use App\Http\Resources\RewardResource;
+use Illuminate\Support\Facades\Storage;
 
 class RewardsController extends Controller
 {
@@ -31,14 +32,24 @@ class RewardsController extends Controller
     {
         $reward = new Reward;
 		$reward->name = $request->input('name');
+		$reward->slogan = $request->input('slogan');
 		$reward->description = $request->input('description');
-		$reward->description2 = $request->input('description2');
-		$reward->src2 = $request->input('src2');
-		$reward->src3 = $request->input('src3');
-		$reward->price = $request->input('price');
-		$reward->unsignedinteger = $request->input('unsignedinteger');
-		$reward->valid_from = $request->input('valid_from');
-		$reward->valid_to = $request->input('valid_to');
+
+        if ($request->has('src1')) {
+            $base64Image = $request->input('src1');
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)) {
+                $type = strtolower($type[1]); 
+                $image = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
+                $fileName = 'reward_images/' . uniqid('', true) . '.' . $type;
+                Storage::disk('public')->put($fileName, $image);
+                $reward->src1 = $fileName;
+            }
+        }
+
+		$reward->points = $request->input('points');
+		$reward->euro = $request->input('price');
+		$reward->valid_from = "2023-01-01";
+		$reward->valid_to = null;
         $reward->save();
 
         return response()->json($reward, 201);
@@ -67,14 +78,22 @@ class RewardsController extends Controller
     {
         $reward = Reward::findOrFail($id);
 		$reward->name = $request->input('name');
+		$reward->slogan = $request->input('slogan');
 		$reward->description = $request->input('description');
-		$reward->description2 = $request->input('description2');
-		$reward->src2 = $request->input('src2');
-		$reward->src3 = $request->input('src3');
-		$reward->price = $request->input('price');
-		$reward->unsignedinteger = $request->input('unsignedinteger');
-		$reward->valid_from = $request->input('valid_from');
-		$reward->valid_to = $request->input('valid_to');
+
+        if ($request->has('src1')) {
+            $base64Image = $request->input('src1');
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)) {
+                $type = strtolower($type[1]); 
+                $image = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64Image));
+                $fileName = 'reward_images/' . uniqid('', true) . '.' . $type;
+                Storage::disk('public')->put($fileName, $image);
+                $reward->src1 = $fileName;
+            }
+        }
+
+		$reward->points = $request->input('points');
+		$reward->euro = $request->input('euro');
         $reward->save();
 
         return response()->json($reward);
