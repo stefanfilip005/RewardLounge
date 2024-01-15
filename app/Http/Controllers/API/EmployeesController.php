@@ -89,6 +89,27 @@ class EmployeesController extends Controller
         }
         return ShiftResource::collection($shifts);
     }
+    public function selfFutureShifts(Request $request){
+        $apicall = array();
+        $apicall['req'] = 'GETNextDienste';
+        $apicall['mnr'] = $request->user()->remoteId;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
+        return curl_exec ($ch);		
+    }
+	
+	
+	
+
+	
+	
+	
+	
 
 
     public function latestShifts(Request $request){
