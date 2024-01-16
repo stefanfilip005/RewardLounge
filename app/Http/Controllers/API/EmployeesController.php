@@ -88,11 +88,12 @@ class EmployeesController extends Controller
             //$shifts = Shift::where('employeeId',228242)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
         }
         return ShiftResource::collection($shifts);
-    }
-    public function futureShifts(Request $request){
+    }    public function futureShifts(Request $request){
         $apicall = array();
-        $apicall['req'] = 'GETNextDienste';
+		
+		$apicall['req'] = 'GETNextDienste';
         $apicall['mnr'] = $request->user()->remoteId;
+		
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -100,17 +101,19 @@ class EmployeesController extends Controller
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-        return curl_exec ($ch);		
-    }
-	
-	
-	
 
-	
-	
-	
-	
+		$response = curl_exec($ch);
 
+		if (curl_errno($ch)) {
+			$error_msg = curl_error($ch);
+			curl_close($ch);
+			return json_encode([]);
+		}
+
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		return $response;
+	}
 
     public function latestShifts(Request $request){
         $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','desc')->paginate(25);
