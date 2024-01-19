@@ -32,6 +32,7 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
         Event::listen(\Slides\Saml2\Events\SignedIn::class, function (\Slides\Saml2\Events\SignedIn $event) {
+            $realIp = request()->header('X-Real-IP') ?? request()->header('X-Forwarded-For') ?? request()->ip();
             $messageId = $event->auth->getLastMessageId();
             $samlUser = $event->auth->getSaml2User();
             $attributes = $samlUser->getAttributes();
@@ -43,7 +44,7 @@ class EventServiceProvider extends ServiceProvider
                         'firstname' => $employee->firstname,
                         'lastname' => $employee->lastname,
                         'logged_in_at' => now(),
-                        'ip_address' => request()->ip(),
+                        'ip_address' => $realIp,
                     ]);
                     abort(redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken));
                     exit;
@@ -56,7 +57,7 @@ class EventServiceProvider extends ServiceProvider
                         'firstname' => $employee->firstname,
                         'lastname' => $employee->lastname,
                         'logged_in_at' => now(),
-                        'ip_address' => request()->ip(),
+                        'ip_address' => $realIp,
                     ]);
                     abort(redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken));
                     exit;
@@ -69,7 +70,7 @@ class EventServiceProvider extends ServiceProvider
                         'firstname' => $employee->firstname,
                         'lastname' => $employee->lastname,
                         'logged_in_at' => now(),
-                        'ip_address' => request()->ip(),
+                        'ip_address' => $realIp,
                     ]);
                     abort(redirect('https://intern.rkhl.at?token='.$employee->createToken("API TOKEN")->plainTextToken));
                     exit;
