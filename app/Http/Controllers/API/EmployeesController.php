@@ -72,7 +72,7 @@ class EmployeesController extends Controller
 
     public function selfRanking(Request $request){
         $userID = $request->user()->remoteId;
-        $userID = 5518;
+        //$userID = 5518;
         $rankings = collect();
         foreach ([2023, 2024] as $year) {
             $ranking = Ranking::where('year', $year)->where('remoteId', $userID)->first();
