@@ -57,44 +57,17 @@ class ProcessPoints implements ShouldQueue
             }
         }
 
-
-        /*
-        $ratings = array();
-        $ratings['FBB'] = array();
-        $rating = new stdClass();
-        $rating->points = 0.15;
-        $rating->start = Carbon::parse("2023-01-11 19:00:00");
-        $rating->end = Carbon::parse("2023-01-11 23:59:00");
-        $ratings['FBB'][] = $rating;
-        */
-
         $points = 0;
         $shiftCounter = 0;
         $shiftUpserts = array();
+        // ToDo: we need to minimize the number of shifts sometime, cause it does not need to calculate everything everytime.
+        // We only have to recalculate it, if something changes in the demandtypes or multiplications.
         $shifts = Shift::where('employeeId',$this->employeeId)->get();
         foreach($shifts as $shift){
             $pointsForThisShift = 0;
             $shiftStart = Carbon::parse($shift->start);
             $shiftEnd = Carbon::parse($shift->end);
             $durationInMinutes = $shiftStart->diffInMinutes($shiftEnd);
-            if(isset($ratings[$shift->demandType])){
-                foreach($ratings[$shift->demandType] as $rating){
-                    if($rating->end->greaterThan($shiftStart) && $rating->start->lessThan($shiftEnd)){
-                        // There is an overlap with the rating
-                        $tmpStart = $shiftStart->copy();
-                        $tmpEnd = $shiftEnd->copy();
-                        if($rating->start->greaterThan($shiftStart)){
-                            $tmpStart = $rating->start->copy();
-                        }
-                        if($rating->end->lessThan($shiftEnd)){
-                            $tmpEnd = $rating->end->copy();
-                        }
-                        $diffInMinutes = $tmpStart->diffInMinutes($tmpEnd);
-                        $points += ($diffInMinutes * $rating->points);
-                        $durationInMinutes -= $diffInMinutes;
-                    }
-                }
-            }
             if(isset($defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType])){
                 $pointsPerShiftWithoutMultiplication = ($durationInMinutes * $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerMinute']) + $defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['pointsPerShift'];
                 if($defaultRatingMap[$shift->demandType . '_X_' . $shift->shiftType]['useMultiplicator']){

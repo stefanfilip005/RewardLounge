@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:grabShifts')->dailyAt('02:10');
         $schedule->command('command:calculatePoints')->dailyAt('02:15');
         $schedule->command('command:calculateRanking')->dailyAt('02:25');
-        $schedule->command('command:calculateRankingDistribution')->dailyAt('02:30');
+        //$schedule->command('command:calculateRankingDistribution')->dailyAt('02:30');
 
     }
 

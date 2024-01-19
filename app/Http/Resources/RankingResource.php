@@ -15,9 +15,9 @@ class RankingResource extends JsonResource
     public function toArray($request)
     {
         //return parent::toArray($request);
+
         return
         [
-			'remoteId' => $this->remoteId,
 			'year' => $this->year,
 			'place' => $this->place,
 			'points' => $this->points,

@@ -45,6 +45,7 @@ class CalculatePoints extends Command
     public function handle()
     {
         $employees = Employee::get();
+        //$employees = Employee::where('remoteId',116931)->get();
         foreach($employees as $employee){
             ProcessPoints::dispatch($employee);
         }
