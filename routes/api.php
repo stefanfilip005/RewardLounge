@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\DemandtypesController;
 use App\Http\Controllers\API\EmployeesController;
 use App\Http\Controllers\API\LoginController;
+use App\Http\Controllers\API\LoginLogController;
 use App\Http\Controllers\API\MultiplicationController;
 use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
@@ -40,11 +41,17 @@ Route::middleware('auth:sanctum')->prefix('self')->group(function () {
     Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
     Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
     
-
     Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
+
+
+
+
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/login-logs', [LoginLogController::class, 'index']);
+
+
     Route::apiResource("demandtypes", DemandtypesController::class); // ToDo - allow the show route for everyone, restrict the save routes for admins
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']); // ToDo - restrict only for admins
     Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
