@@ -3,7 +3,7 @@
 use App\Http\Controllers\API\DemandtypesController;
 use App\Http\Controllers\API\EmployeesController;
 use App\Http\Controllers\API\LoginController;
-use App\Http\Controllers\API\LoginLogController;
+use App\Http\Controllers\API\LogController;
 use App\Http\Controllers\API\MultiplicationController;
 use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Ranking;
 use App\Models\Shift;
 use Carbon\Carbon;
-use App\Models\RankingDistribution;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,43 +32,57 @@ use App\Models\RankingDistribution;
 
 Route::get('login',function(Request $request){ return redirect('https://intern.rkhl.at/saml2/2209a842-3461-4241-968a-2d950ea35237/login'); })->name('login');;
 
-Route::middleware('auth:sanctum')->prefix('self')->group(function () {
-    Route::get("user-profile", [EmployeesController::class, 'userProfile']);
-    Route::get("ranking", [EmployeesController::class, 'selfRanking']);
-    Route::get("shifts", [EmployeesController::class, 'selfShifts']);
 
-    Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
-    Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
-    
-    Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
+Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
+    Route::prefix('self')->group(function () {
+        Route::get("user-profile", [EmployeesController::class, 'userProfile']);
+        Route::get("ranking", [EmployeesController::class, 'selfRanking']);
 
-
-
-
+        Route::get("shifts", [EmployeesController::class, 'selfShifts']);
+        Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
+        Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
+    });
+    Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/login-logs', [LoginLogController::class, 'index']);
 
-
-    Route::apiResource("demandtypes", DemandtypesController::class); // ToDo - allow the show route for everyone, restrict the save routes for admins
-    Route::apiResource("employees", EmployeesController::class)->only(['index','show']); // ToDo - restrict only for admins
-    Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
-    Route::get("rankingDistribution", [EmployeesController::class, 'rankingDistribution']);
-    
+/*
+ * ----------------------------------------------------------------
+ * Protected - allowed for moderators
+ * ----------------------------------------------------------------
+ */
+Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(function () {
+    Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
+    Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
 
-    Route::apiResource("rewards", RewardsController::class);
+});
 
-    Route::prefix('multiplications')->group(function () {
-        Route::get('/', [MultiplicationController::class, 'index']);
-        Route::get('/{id}', [MultiplicationController::class, 'show']);
-        Route::post('/', [MultiplicationController::class, 'store']);
-        Route::put('/{id}', [MultiplicationController::class, 'update']);
-        Route::delete('/{id}', [MultiplicationController::class, 'destroy']);
-    });
+
+/*
+ * ----------------------------------------------------------------
+ * Protected - allowed for admins
+ * ----------------------------------------------------------------
+ */
+Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(function () {
+    Route::get('/login-logs', [LogController::class, 'loginLog']);
+    Route::get('/access-logs', [LogController::class, 'accessLog']);
+
+    Route::apiResource("demandtypes", DemandtypesController::class);
+    Route::apiResource("rewards", RewardsController::class);
+});
+
+
+/*
+ * ----------------------------------------------------------------
+ * Protected - allowed for developers
+ * ----------------------------------------------------------------
+ */
+Route::middleware('auth:sanctum', 'log.pageview', 'access:is.developer')->group(function () {
 
 });
+
+
 
 Route::get('startPointsCalculationForAllEmployees',function(Request $request){
     $employees = Employee::get();
@@ -84,6 +97,13 @@ Route::get('startRankingCalculation',function(Request $request){
     $year = 2024;
     EmployeesController::calculateRankings($year);
 });
+
 /*
-Route::apiResource("shifts", ShiftsController::class);
+    Route::prefix('multiplications')->group(function () {
+        Route::get('/', [MultiplicationController::class, 'index']);
+        Route::get('/{id}', [MultiplicationController::class, 'show']);
+        Route::post('/', [MultiplicationController::class, 'store']);
+        Route::put('/{id}', [MultiplicationController::class, 'update']);
+        Route::delete('/{id}', [MultiplicationController::class, 'destroy']);
+    });
 */

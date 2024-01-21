@@ -8,13 +8,11 @@ use App\Models\Employee;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\RankingResource;
-use App\Http\Resources\RankingDistributionResource;
 use App\Http\Resources\ShiftResource;
 use App\Http\Resources\StatisticShiftResource;
 use App\Models\Ranking;
 use App\Models\Shift;
 use Carbon\Carbon;
-use App\Models\RankingDistribution;
 use Illuminate\Http\Request;
 
 class EmployeesController extends Controller
@@ -152,14 +150,6 @@ class EmployeesController extends Controller
         return StatisticShiftResource::collection($shifts);
     }
     
-    
-
-    public function rankingDistribution(Request $request){
-        $year = 2023;
-        $rankingDistribution = RankingDistribution::where('year',$year)->orderBy('limit','asc')->get();
-        return RankingDistributionResource::collection($rankingDistribution);
-    }
-
     
     /**
      * Refactor this method later into an own controller

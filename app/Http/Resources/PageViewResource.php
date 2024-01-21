@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RankingDistributionResource extends JsonResource
+class PageViewResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,12 @@ class RankingDistributionResource extends JsonResource
      */
     public function toArray($request)
     {
-        //return parent::toArray($request);
-        return
-        [
-			'limit' => $this->limit,
-			'count' => $this->count
+        return [
+            'remoteId' => $this->remoteId,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
+            'date' => $this->date,
+            'count' => $this->route_count,
         ];
     }
 }
