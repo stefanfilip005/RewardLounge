@@ -21,6 +21,7 @@ class RankingResource extends JsonResource
 			'year' => $this->year,
 			'place' => $this->place,
 			'points' => $this->points,
+			'location' => $this->location,
 			'pointsForNext' => $this->pointsForNext
         ];
     }

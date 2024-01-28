@@ -70,20 +70,54 @@ class EmployeesController extends Controller
 
     public function selfRanking(Request $request){
         $userID = $request->user()->remoteId;
-        //$userID = 5518;
+        $userID = 5518;
+        $userID = 38128;//228242;
         $rankings = collect();
+        $locations = [null, 38, 39]; // Array of locations including null
+
         foreach ([2023, 2024] as $year) {
-            $ranking = Ranking::where('year', $year)->where('remoteId', $userID)->first();
-            if(!$ranking){            
-                $lastRanking = Ranking::where('year', $year)->orderBy('place', 'desc')->first();
-                // Clone the last ranking and modify it
-                $ranking = $lastRanking->replicate();
-                $ranking->place = $ranking->place + 1;
-                $ranking->pointsForNext = 1;
-                $ranking->points = 0;
-                $ranking->remoteId = $userID;
+            foreach ($locations as $location) {
+                // Modify the query to consider location
+                $ranking = Ranking::where('year', $year)
+                                    ->where('remoteId', $userID)
+                                    ->when($location, function ($query, $location) {
+                                        return $query->where('location', $location);
+                                    }, function ($query) {
+                                        return $query->whereNull('location');
+                                    })
+                                    ->first();
+    
+                if (!$ranking) {
+                    // If no ranking found, replicate the last ranking for this year and location
+                    $lastRanking = Ranking::where('year', $year)
+                                            ->when($location, function ($query, $location) {
+                                                return $query->where('location', $location);
+                                            }, function ($query) {
+                                                return $query->whereNull('location');
+                                            })
+                                            ->orderBy('place', 'desc')
+                                            ->first();
+                    
+                    if ($lastRanking) {
+                        $ranking = $lastRanking->replicate();
+                        $ranking->place = $ranking->place + 1;
+                        $ranking->pointsForNext = 1;
+                        $ranking->points = 0;
+                        $ranking->remoteId = $userID;
+                    } else {
+                        // Handle the case where there are no rankings at all for this year and location
+                        $ranking = new Ranking([
+                            'year' => $year,
+                            'remoteId' => $userID,
+                            'location' => $location,
+                            'place' => 1,
+                            'pointsForNext' => 0,
+                            'points' => 0
+                        ]);
+                    }
+                }
+                $rankings->push($ranking);
             }
-            $rankings->push($ranking);
         }
         return RankingResource::collection($rankings);
     }
@@ -159,6 +193,8 @@ class EmployeesController extends Controller
         $yearEnd = Carbon::create($year+1,1,1,0,0,0,"Europe/Vienna");
 
         $employees = array();
+        $employeesHollabrunn = array();
+        $employeesHaugsdorf = array();
         $shifts = Shift::where('start','>=',$yearStart)->where('start','<',$yearEnd)->get();
         foreach($shifts as $shift){
             if(!isset($employees[$shift->employeeId])){
@@ -167,6 +203,7 @@ class EmployeesController extends Controller
                     'place' => 0,
                     'pointsForNext' => 0,
                     'points' => 0,
+                    'location' => null,
                     'year' => $year
                 ];
             }
@@ -175,6 +212,42 @@ class EmployeesController extends Controller
             }else{
                 $employees[$shift->employeeId]['points'] += $shift->points;
             }
+
+            if($shift->location == 38){
+                if(!isset($employeesHollabrunn[$shift->employeeId])){
+                    $employeesHollabrunn[$shift->employeeId] = [
+                        'remoteId' => $shift->employeeId,
+                        'place' => 0,
+                        'pointsForNext' => 0,
+                        'points' => 0,
+                        'location' => 38,
+                        'year' => $year
+                    ];
+                }
+                if($shift->overwrittenPoints != null){
+                    $employeesHollabrunn[$shift->employeeId]['points'] += $shift->overwrittenPoints;
+                }else{
+                    $employeesHollabrunn[$shift->employeeId]['points'] += $shift->points;
+                }
+            }
+
+            if($shift->location == 39){
+                if(!isset($employeesHaugsdorf[$shift->employeeId])){
+                    $employeesHaugsdorf[$shift->employeeId] = [
+                        'remoteId' => $shift->employeeId,
+                        'place' => 0,
+                        'pointsForNext' => 0,
+                        'points' => 0,
+                        'location' => 39,
+                        'year' => $year
+                    ];
+                }
+                if($shift->overwrittenPoints != null){
+                    $employeesHaugsdorf[$shift->employeeId]['points'] += $shift->overwrittenPoints;
+                }else{
+                    $employeesHaugsdorf[$shift->employeeId]['points'] += $shift->points;
+                }
+            }
         }
         foreach($employees as $key => $employee){
             $employees[$key]['points'] = floor($employee['points']);
@@ -182,13 +255,28 @@ class EmployeesController extends Controller
                 unset($employees[$key]);
             }
         }
-
         usort($employees, function($a, $b){ return $b['points'] - $a['points']; });
+
+        foreach($employeesHollabrunn as $key => $employee){
+            $employeesHollabrunn[$key]['points'] = floor($employee['points']);
+            if($employee['points'] == 0){
+                unset($employeesHollabrunn[$key]);
+            }
+        }
+        usort($employeesHollabrunn, function($a, $b){ return $b['points'] - $a['points']; });
+
+        foreach($employeesHaugsdorf as $key => $employee){
+            $employeesHaugsdorf[$key]['points'] = floor($employee['points']);
+            if($employee['points'] == 0){
+                unset($employeesHaugsdorf[$key]);
+            }
+        }
+        usort($employeesHaugsdorf, function($a, $b){ return $b['points'] - $a['points']; });
+
 
         $previousHighscore = PHP_INT_MAX;
         $place = 1;
         $platzierungCounter = 1;
-
         if(count($employees) > 2){
             for( $i = 0 ; $i < count($employees) ; $i++ ){
                 if($i == 0){
@@ -214,9 +302,85 @@ class EmployeesController extends Controller
                 }
                 $platzierungCounter++;
             }
-            Ranking::where('year',$year)->delete();
-            Ranking::upsert($employees,['year','remoteId'],['place','points','pointsForNext']);
+            Ranking::where('year',$year)->whereNull('location')->delete();
+            Ranking::upsert($employees,['year','remoteId','location'],['place','points','pointsForNext']);
         }
+
+
+
+        $previousHighscore = PHP_INT_MAX;
+        $place = 1;
+        $platzierungCounter = 1;
+        if(count($employeesHollabrunn) > 2){
+            for( $i = 0 ; $i < count($employeesHollabrunn) ; $i++ ){
+                if($i == 0){
+                }else if($i >= count($employeesHollabrunn)-1){
+                    if($employeesHollabrunn[$i]['points'] == $employeesHollabrunn[$i-1]['points']){
+                        $employeesHollabrunn[$i]['pointsForNext'] = 1;
+                    }else{
+                        $employeesHollabrunn[$i]['pointsForNext'] = $employeesHollabrunn[$i-1]['points'] - $employeesHollabrunn[$i]['points'];
+                    }
+                }else{
+                    if($employeesHollabrunn[$i]['points'] == $employeesHollabrunn[$i-1]['points'] || $employeesHollabrunn[$i]['points'] == $employeesHollabrunn[$i+1]['points']){
+                        $employeesHollabrunn[$i]['pointsForNext'] = 1;
+                    }else{
+                        $employeesHollabrunn[$i]['pointsForNext'] = $employeesHollabrunn[$i-1]['points'] - $employeesHollabrunn[$i]['points'];
+                    }
+                }
+    
+                $employeesHollabrunn[$i]['place'] = $place;
+                if($previousHighscore != $employeesHollabrunn[$i]['points']){
+                    $place = $platzierungCounter;
+                    $employeesHollabrunn[$i]['place'] = $place;
+                    $previousHighscore = $employeesHollabrunn[$i]['points'];
+                }
+                $platzierungCounter++;
+            }
+            Ranking::where('year',$year)->where('location', 38)->delete();
+            Ranking::upsert($employeesHollabrunn,['year','remoteId','location'],['place','points','pointsForNext']);
+        }
+
+
+
+
+        $previousHighscore = PHP_INT_MAX;
+        $place = 1;
+        $platzierungCounter = 1;
+        if(count($employeesHaugsdorf) > 2){
+            for( $i = 0 ; $i < count($employeesHaugsdorf) ; $i++ ){
+                if($i == 0){
+                }else if($i >= count($employeesHaugsdorf)-1){
+                    if($employeesHaugsdorf[$i]['points'] == $employeesHaugsdorf[$i-1]['points']){
+                        $employeesHaugsdorf[$i]['pointsForNext'] = 1;
+                    }else{
+                        $employeesHaugsdorf[$i]['pointsForNext'] = $employeesHaugsdorf[$i-1]['points'] - $employeesHaugsdorf[$i]['points'];
+                    }
+                }else{
+                    if($employeesHaugsdorf[$i]['points'] == $employeesHaugsdorf[$i-1]['points'] || $employeesHaugsdorf[$i]['points'] == $employeesHaugsdorf[$i+1]['points']){
+                        $employeesHaugsdorf[$i]['pointsForNext'] = 1;
+                    }else{
+                        $employeesHaugsdorf[$i]['pointsForNext'] = $employeesHaugsdorf[$i-1]['points'] - $employeesHaugsdorf[$i]['points'];
+                    }
+                }
+    
+                $employeesHaugsdorf[$i]['place'] = $place;
+                if($previousHighscore != $employeesHaugsdorf[$i]['points']){
+                    $place = $platzierungCounter;
+                    $employeesHaugsdorf[$i]['place'] = $place;
+                    $previousHighscore = $employeesHaugsdorf[$i]['points'];
+                }
+                $platzierungCounter++;
+            }
+            Ranking::where('year',$year)->where('location', 39)->delete();
+            Ranking::upsert($employeesHaugsdorf,['year','remoteId','location'],['place','points','pointsForNext']);
+        }
+
+
+
+
+
+
+
     }
 
 }
