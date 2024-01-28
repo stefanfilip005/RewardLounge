@@ -79,7 +79,11 @@ class ProcessPoints implements ShouldQueue
                 if($pointsForThisShift > 0){
                     $shiftCounter++;
                 }
-                $points += $pointsForThisShift;
+                if($shift->overwrittenPoints != null){
+                    $points += $shift->overwrittenPoints;
+                }else{
+                    $points += $pointsForThisShift;
+                }
             }
             $shiftUpserts[] = ['id' => $shift->id, 'employeeId' => $shift->employeeId, 'start' => $shift->start, 'end' => $shift->end, 'demandType' => $shift->demandType,'shiftType' => $shift->shiftType, 'location' => $shift->location, 'points' => $pointsForThisShift, 'lastPointCalculation' => Carbon::now()];
         }

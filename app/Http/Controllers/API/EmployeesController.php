@@ -170,7 +170,11 @@ class EmployeesController extends Controller
                     'year' => $year
                 ];
             }
-            $employees[$shift->employeeId]['points'] += $shift->points;
+            if($shift->overwrittenPoints != null){
+                $employees[$shift->employeeId]['points'] += $shift->overwrittenPoints;
+            }else{
+                $employees[$shift->employeeId]['points'] += $shift->points;
+            }
         }
         foreach($employees as $key => $employee){
             $employees[$key]['points'] = floor($employee['points']);

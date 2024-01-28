@@ -42,6 +42,7 @@ class test extends Command
      */
     public function handle()
     {
+        exit;
         $filename = 'Punktesystem_2023.CSV';
         if (Storage::exists($filename)) {
             $contents = Storage::get($filename);

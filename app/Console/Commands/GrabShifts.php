@@ -122,8 +122,40 @@ class GrabShifts extends Command
             }
             Demandtype::upsert($demandTypes,['name','shiftType']);
             Employee::upsert($employees,['remoteId']);
+
+
+            // Step 1: Retrieve and store shifts with overwritten points
+            $shiftsWithOverwrittenPoints = Shift::where('start', '>=', $lowestDate)
+                ->where('end', '<=', $highestDate)
+                ->whereNotNull('overwrittenPoints')
+                ->get(['employeeId', 'start', 'end', 'demandType', 'shiftType', 'location', 'overwrittenPoints']);
+
+            $temporaryStorage = $shiftsWithOverwrittenPoints->toArray();
+
+
+            // Step 2: Delete and insert shifts
             Shift::where('start','>=',$lowestDate)->where('end','<=',$highestDate)->delete();
             Shift::insert($allShifts);
+
+            // Step 3: Match and update new shifts
+            $newShifts = Shift::where('start', '>=', $lowestDate)->where('end', '<=', $highestDate)->get();
+
+            foreach ($newShifts as $newShift) {
+                foreach ($temporaryStorage as $oldShift) {
+                    if ($newShift->employeeId == $oldShift['employeeId'] && 
+                        $newShift->start == $oldShift['start'] && 
+                        $newShift->end == $oldShift['end'] && 
+                        $newShift->demandType == $oldShift['demandType'] && 
+                        $newShift->shiftType == $oldShift['shiftType'] && 
+                        $newShift->location == $oldShift['location']) {
+                        // Match found - update overwrittenPoints
+                        $newShift->overwrittenPoints = $oldShift['overwrittenPoints'];
+                        $newShift->save();
+                        break; // Break inner loop if match is found
+                    }
+                }
+            }
+
         }
     }
 }
