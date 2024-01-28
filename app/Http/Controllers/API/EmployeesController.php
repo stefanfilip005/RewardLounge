@@ -70,8 +70,8 @@ class EmployeesController extends Controller
 
     public function selfRanking(Request $request){
         $userID = $request->user()->remoteId;
-        $userID = 5518;
-        $userID = 38128;//228242;
+        //$userID = 5518;
+        //$userID = 38128;//228242;
         $rankings = collect();
         $locations = [null, 38, 39]; // Array of locations including null
 
