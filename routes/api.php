@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\DemandtypesController;
 use App\Http\Controllers\API\EmployeesController;
+use App\Http\Controllers\API\InfoblattController;
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\LogController;
 use App\Http\Controllers\API\MultiplicationController;
@@ -43,6 +44,10 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
         Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
     });
     Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
+    Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']);
+
+    Route::get('/infoblaetter/{year}/{month}.pdf', [InfoblattController::class, 'getInfoblatt'])->where(['year' => '[0-9]{4}', 'month' => '[0-9]{2}']);// download pdf
+
 });
 
 
@@ -55,7 +60,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
-
+    Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);
 });
 
 
