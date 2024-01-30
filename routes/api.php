@@ -61,6 +61,8 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
     Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);
+    Route::post('/shifts/search', [ShiftsController::class, 'search']);
+    Route::post('/shifts/update-points', [ShiftsController::class, 'updatePoints']);
 });
 
 

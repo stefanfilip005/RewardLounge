@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Shift;
 use App\Http\Resources\ShiftResource;
+use Illuminate\Http\Request;
 
 class ShiftsController extends Controller
 {
@@ -30,6 +31,55 @@ class ShiftsController extends Controller
     {
         $shift = Shift::findOrFail($id);
         return new ShiftResource($shift);
+    }
+
+    public function search(Request $request)
+    {
+
+        $query = Shift::query();
+
+        // Check if location is provided and valid
+        if ($request->has('location') && $request->location != "") {
+            $locationMapping = [
+                'Hollabrunn' => 38,
+                'Haugsdorf' => 39,
+            ];
+    
+            $locationId = $locationMapping[$request->location] ?? null;
+    
+            if (!$locationId) {
+                return response()->json(['message' => 'Invalid location'], 400);
+            }
+            $locationId = $locationMapping[$request->location];
+            $query->where('location', $locationId);
+        }
+    
+        // Check if personalNumber is provided
+        if ($request->has('personalNumber') && $request->personalNumber != "") {
+            $query->where('employeeId', $request->personalNumber);
+        }
+    
+        // Check if date is provided
+        if ($request->has('date') && $request->date != "") {
+            $query->whereDate('start', $request->date);
+        }
+    
+        $shifts = $query->orderBy('start','desc')->limit(10)->get();
+
+        return ShiftResource::collection($shifts);
+    }
+    public function updatePoints(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+            'overwrittenPoints' => 'required|numeric'
+        ]);
+
+        $shift = Shift::findOrFail($request->id);
+        $shift->overwrittenPoints = $request->overwrittenPoints;
+        $shift->save();
+
+        return response()->json(['message' => 'Shift points updated successfully']);
     }
 
 }

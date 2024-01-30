@@ -17,6 +17,7 @@ class ShiftResource extends JsonResource
         //return parent::toArray($request);
         return
         [
+			'id' => $this->id,
 			'employeeId' => $this->employeeId,
 			'start' => $this->start,
 			'end' => $this->end,
