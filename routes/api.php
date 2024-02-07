@@ -8,6 +8,7 @@ use App\Http\Controllers\API\LogController;
 use App\Http\Controllers\API\MultiplicationController;
 use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
+use App\Http\Controllers\API\CartController;
 use App\Jobs\ProcessPoints;
 use App\Models\Demandtype;
 use App\Models\Employee;
@@ -42,6 +43,17 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
         Route::get("shifts", [EmployeesController::class, 'selfShifts']);
         Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
         Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
+
+
+        Route::prefix('cart')->group(function () {
+            Route::get('/content', [CartController::class, 'getCartContents']);
+            Route::get('/count', [CartController::class, 'getCartCount']);
+            Route::post('/add-item', [CartController::class, 'addItem']);
+            Route::patch('/item/{itemId}/quantity', [CartController::class, 'updateItemQuantity']);
+            Route::patch('/item/{itemId}/note', [CartController::class, 'updateItemNote']);
+            Route::delete('/item/{itemId}', [CartController::class, 'deleteItem']);
+            Route::post('/checkout', [CartController::class, 'checkout']);
+        });
     });
     Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']);

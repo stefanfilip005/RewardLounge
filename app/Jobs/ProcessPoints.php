@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Demandtype;
 use App\Models\Employee;
 use App\Models\Multiplication;
+use App\Models\Order;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -87,6 +88,12 @@ class ProcessPoints implements ShouldQueue
             }
             $shiftUpserts[] = ['id' => $shift->id, 'employeeId' => $shift->employeeId, 'start' => $shift->start, 'end' => $shift->end, 'demandType' => $shift->demandType,'shiftType' => $shift->shiftType, 'location' => $shift->location, 'points' => $pointsForThisShift, 'lastPointCalculation' => Carbon::now()];
         }
+
+        $orders = Order::where('remoteId',$this->employeeId)->get();
+        foreach($orders as $order){
+            $points = $points - $order->total_points;
+        }
+
         Employee::where('remoteId',$this->employeeId)->update(['points' => $points, 'shifts' => $shiftCounter, 'lastPointCalculation' => Carbon::now()]);
         Shift::upsert($shiftUpserts,['id'],['points', 'lastPointCalculation']);
     }
