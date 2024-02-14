@@ -23,7 +23,7 @@ class TestEmail extends Mailable
 
     public function build()
     {
-        return $this->from('stefan005@gmx.at') // Replace with your "from" address
+        return $this->from('noreply@rkhl.at') // Replace with your "from" address
                     ->view('emails.test'); // Ensure you create this simple view
     }
 }
