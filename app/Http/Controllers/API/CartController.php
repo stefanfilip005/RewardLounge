@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
+use App\Mail\OrderPlacedForCustomer;
+use App\Mail\OrderPlacedForTeam;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -10,6 +12,7 @@ use App\Models\Employee;
 use App\Models\Order;
 use App\Models\Reward;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class CartController extends Controller
 {
@@ -179,7 +182,19 @@ class CartController extends Controller
             $employee->save();
     
             DB::commit();
-    
+
+            // After saving the order and before committing the transaction
+            Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
+            // Assuming you have a predefined list of team email addresses
+
+            // ToDo: Select the team based of a variable in employees table
+            $teamEmails = ['stefan.filip.005@gmail.com']; // Adjust accordingly
+            $teamEmails = ['Clemens.Schachhuber@n.roteskreuz.at']; // Adjust accordingly
+            $teamEmails = ['Christian.Hafner@n.roteskreuz.at']; // Adjust accordingly
+            foreach ($teamEmails as $teamEmail) {
+                Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
+            }
+
             return response()->json(['message' => 'Order placed successfully'], 200);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -9,6 +9,7 @@ use App\Http\Controllers\API\MultiplicationController;
 use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
 use App\Http\Controllers\API\CartController;
+use App\Http\Controllers\API\OrderController;
 use App\Jobs\ProcessPoints;
 use App\Models\Demandtype;
 use App\Models\Employee;
@@ -54,6 +55,12 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
             Route::delete('/item/{itemId}', [CartController::class, 'deleteItem']);
             Route::post('/checkout', [CartController::class, 'checkout']);
         });
+
+        Route::prefix('order')->group(function () {
+            Route::get('/list', [OrderController::class, 'getSelfOrders']);
+        });
+
+
     });
     Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']);
@@ -75,6 +82,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);
     Route::post('/shifts/search', [ShiftsController::class, 'search']);
     Route::post('/shifts/update-points', [ShiftsController::class, 'updatePoints']);
+    Route::get('/orders', [OrderController::class, 'getOrders']);
 });
 
 

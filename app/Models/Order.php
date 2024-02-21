@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-    protected $fillable = ['remoteId', 'total_points'];
+    protected $fillable = ['remoteId', 'total_points', 'state'];
     
     public function orderItems()
     {

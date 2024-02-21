@@ -17,6 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('remoteId');
             $table->unsignedInteger('total_points')->default(0);
+            $table->unsignedTinyInteger('state')->default(0);
             $table->foreign('remoteId')->references('remoteId')->on('employees')->onDelete('cascade');
             $table->timestamps();
             // Add any other fields you need for an order, like status, total price, etc.
