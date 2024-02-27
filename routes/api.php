@@ -62,7 +62,6 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
 
 
     });
-    Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
     Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']);
 
@@ -77,6 +76,7 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(function () {
+    Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
     Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);
