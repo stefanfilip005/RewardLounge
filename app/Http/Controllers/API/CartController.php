@@ -174,7 +174,6 @@ class CartController extends Controller
             $order->total_points = $totalPoints;
             $order->save();
     
-            // Optionally, clear the cart
             $cart->items()->delete();
             $cart->delete();
 
@@ -182,15 +181,13 @@ class CartController extends Controller
             $employee->save();
     
             DB::commit();
-
-            // After saving the order and before committing the transaction
             Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
-            // Assuming you have a predefined list of team email addresses
 
             // ToDo: Select the team based of a variable in employees table
-            $teamEmails = ['stefan.filip.005@gmail.com']; // Adjust accordingly
-            $teamEmails = ['Clemens.Schachhuber@n.roteskreuz.at']; // Adjust accordingly
-            $teamEmails = ['Christian.Hafner@n.roteskreuz.at']; // Adjust accordingly
+            $teamEmails = array();
+            $teamEmails[] = 'stefan.filip.005@gmail.com';
+            $teamEmails[] = 'Clemens.Schachhuber@n.roteskreuz.at';
+            $teamEmails[] = 'Christian.Hafner@n.roteskreuz.at';
             foreach ($teamEmails as $teamEmail) {
                 Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
             }

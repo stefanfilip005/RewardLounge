@@ -122,13 +122,18 @@ class EmployeesController extends Controller
         return RankingResource::collection($rankings);
     }
     public function selfShifts(Request $request){
+        $userID = $request->user()->remoteId;
+        //$userID = 228242;
         if(isset($request->year)) {
             $year = $request->year;
-            $shifts = Shift::where('employeeId',$request->user()->remoteId)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
+            $shifts = Shift::where('employeeId',$userID)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
             //$shifts = Shift::where('employeeId',228242)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
         }
         return ShiftResource::collection($shifts);
-    }    public function futureShifts(Request $request){
+    }    
+    
+    
+    public function futureShifts(Request $request){
         $apicall = array();
 		
 		$apicall['req'] = 'GETNextDienste';
