@@ -148,7 +148,7 @@ class CartController extends Controller
         try {
             $totalPoints = 0; // Initialize total points
 
-            $order = new Order(['remoteId' => $employee->remoteId]);
+            $order = new Order(['remoteId' => $employee->remoteId,'created_at_datetime' => now()]);
             $order->save();
     
             foreach ($cart->items as $cartItem) {

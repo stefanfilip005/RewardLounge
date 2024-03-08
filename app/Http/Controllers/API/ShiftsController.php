@@ -21,6 +21,8 @@ class ShiftsController extends Controller
         return ShiftResource::collection($shifts);
     }
 
+
+
     /**
      * Display the specified resource.
      *

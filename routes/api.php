@@ -76,6 +76,10 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(function () {
+
+    
+    Route::get('/employeesFromOrders', [OrderController::class, 'employeesFromOrders']);
+
     Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
@@ -83,6 +87,10 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::post('/shifts/search', [ShiftsController::class, 'search']);
     Route::post('/shifts/update-points', [ShiftsController::class, 'updatePoints']);
     Route::get('/orders', [OrderController::class, 'getOrders']);
+    Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
+
+    
+    Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
 });
 
 
