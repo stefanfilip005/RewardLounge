@@ -8,9 +8,7 @@ use App\Models\LoginLog;
 use App\Http\Resources\LoginLogResource;
 use App\Http\Resources\PageViewResource;
 use App\Models\PageView;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class LogController extends Controller
 {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\OrderResource;
+use App\Jobs\ProcessPoints;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -120,7 +121,11 @@ class OrderController extends Controller
                 'state_3_datetime' => null, 'state_3_user_id' => null,
                 'state_4_datetime' => null, 'state_4_user_id' => null,
                 'state_5_datetime' => now(), 'state_5_user_id' => $user->remoteId,
-            ]);
+            ]);   
+        }         
+        $employee = Employee::where('remoteId',$order->remoteId)->first();
+        if ($employee) {
+            ProcessPoints::dispatch($employee);
         }
 
         return response()->json(['message' => 'Order state updated successfully.'], 200);

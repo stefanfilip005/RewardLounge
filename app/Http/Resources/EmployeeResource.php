@@ -26,9 +26,9 @@ class EmployeeResource extends JsonResource
 			'shifts' => $this->shifts,
 			'lastPointCalculation' => $this->lastPointCalculation,
 
-			'isAdministrator' => $this->isAdministrator,
-			'isModerator' => $this->isModerator,
-			'isDeveloper' => $this->isDeveloper,
+			'isAdministrator' => $this->isAdministrator ? true : false,
+			'isModerator' => $this->isModerator ? true : false,
+			'isDeveloper' => $this->isDeveloper ? true : false,
 			'showNameInRanking' => $this->showNameInRanking,
         ];
     }

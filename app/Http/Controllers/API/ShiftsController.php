@@ -40,7 +40,6 @@ class ShiftsController extends Controller
 
         $query = Shift::query();
 
-        // Check if location is provided and valid
         if ($request->has('location') && $request->location != "") {
             $locationMapping = [
                 'Hollabrunn' => 38,
@@ -56,12 +55,10 @@ class ShiftsController extends Controller
             $query->where('location', $locationId);
         }
     
-        // Check if personalNumber is provided
         if ($request->has('personalNumber') && $request->personalNumber != "") {
             $query->where('employeeId', $request->personalNumber);
         }
     
-        // Check if date is provided
         if ($request->has('date') && $request->date != "") {
             $query->whereDate('start', $request->date);
         }

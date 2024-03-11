@@ -18,7 +18,7 @@ class RewardsController extends Controller
      */
     public function index()
     {
-        $rewards = Reward::paginate(15);
+        $rewards = Reward::paginate(500);
         return RewardResource::collection($rewards);
     }
 

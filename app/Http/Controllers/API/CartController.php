@@ -31,7 +31,7 @@ class CartController extends Controller
 
     public function getCartContents(Request $request)
     {
-        $user = $request->user(); // Or however you're obtaining the authenticated user
+        $user = $request->user();
         $cart = Cart::with('items')->where('remoteId', $user->remoteId)->first();
         if (!$cart) {
             return response()->json(['message' => 'No cart found'], 404);
@@ -40,7 +40,6 @@ class CartController extends Controller
     }
 
 
-    // Method to add an item to the cart
     public function addItem(Request $request)
     {
         $user = $request->user();
@@ -48,21 +47,17 @@ class CartController extends Controller
         $cart = Cart::firstOrCreate(['remoteId' => $employee->remoteId]);
 
         $reward_id = $request->input('reward_id');
-        $quantity = $request->input('quantity', 1); // Default to 1 if not provided
-        $note = $request->input('note', ''); // Default to empty string if not provided
+        $quantity = $request->input('quantity', 1); 
+        $note = $request->input('note', ''); 
 
-        // Check for an existing item with the same reward_id AND note
         $cartItem = CartItem::where([
             ['cart_id', '=', $cart->id],
             ['reward_id', '=', $reward_id],
-            //['note', '=', $note] // Include note in the search criteria
         ])->first();
 
         if ($cartItem) {
-            // If an item exists with the same reward_id and note, just update the quantity
             $cartItem->quantity += $quantity;
         } else {
-            // Otherwise, create a new CartItem instance
             $cartItem = new CartItem([
                 'cart_id' => $cart->id,
                 'reward_id' => $reward_id,
@@ -71,7 +66,9 @@ class CartController extends Controller
             ]);
         }
 
-        $cartItem->save();
+        if($cartItem->quantity <= 20){
+            $cartItem->save();
+        }
 
         return response()->json(['message' => 'Item added to cart successfully', 'cartItem' => $cartItem]);
     }
@@ -108,7 +105,7 @@ class CartController extends Controller
     
         $item = CartItem::where('id', $itemId)->where('cart_id', $cart->id)->first();
         if ($item) {
-            $note = $request->input('note', ''); // Default to empty string if not provided
+            $note = $request->input('note', '');
             $item->note = $note;
             $item->save();
             return response()->json(['message' => 'Item note updated successfully']);
@@ -152,7 +149,7 @@ class CartController extends Controller
             $order->save();
     
             foreach ($cart->items as $cartItem) {
-                $reward = $cartItem->reward; // Assuming you have a relationship set up in the CartItem model
+                $reward = $cartItem->reward; 
                 
                 $totalPoints += $reward->points * $cartItem->quantity;
                 
@@ -160,14 +157,12 @@ class CartController extends Controller
                     'reward_id' => $cartItem->reward_id,
                     'quantity' => $cartItem->quantity,
                     'note' => $cartItem->note,
-                    // Copy these fields from the Reward model
                     'name' => $reward->name,
                     'slogan' => $reward->slogan,
                     'description' => $reward->description,
                     'src1' => $reward->src1,
                     'points' => $reward->points,
                     'euro' => $reward->euro,
-                    // Add other fields as necessary
                 ]);
             }
 
@@ -183,11 +178,11 @@ class CartController extends Controller
             DB::commit();
             Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
 
-            // ToDo: Select the team based of a variable in employees table
+            $employees = Employee::where('isModerator', true)->orWhere('isAdministrator', true)->orWhere('isDeveloper', true)->get(['email']);
             $teamEmails = array();
-            $teamEmails[] = 'stefan.filip.005@gmail.com';
-            $teamEmails[] = 'Clemens.Schachhuber@n.roteskreuz.at';
-            $teamEmails[] = 'Christian.Hafner@n.roteskreuz.at';
+            foreach ($employees as $employeeMail) {
+                $teamEmails[] = $employeeMail->email;
+            }
             foreach ($teamEmails as $teamEmail) {
                 Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
             }

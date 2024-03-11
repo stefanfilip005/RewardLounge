@@ -89,7 +89,7 @@ class ProcessPoints implements ShouldQueue
             $shiftUpserts[] = ['id' => $shift->id, 'employeeId' => $shift->employeeId, 'start' => $shift->start, 'end' => $shift->end, 'demandType' => $shift->demandType,'shiftType' => $shift->shiftType, 'location' => $shift->location, 'points' => $pointsForThisShift, 'lastPointCalculation' => Carbon::now()];
         }
 
-        $orders = Order::where('remoteId',$this->employeeId)->get();
+        $orders = Order::where('remoteId', $this->employeeId)->where('state', '!=', 5)->get();
         foreach($orders as $order){
             $points = $points - $order->total_points;
         }

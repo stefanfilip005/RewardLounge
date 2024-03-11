@@ -1,26 +1,19 @@
 <?php
 
-use App\Http\Controllers\API\DemandtypesController;
 use App\Http\Controllers\API\EmployeesController;
 use App\Http\Controllers\API\InfoblattController;
-use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\LogController;
-use App\Http\Controllers\API\MultiplicationController;
 use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
 use App\Http\Controllers\API\CartController;
+use App\Http\Controllers\API\FAQController;
+use App\Http\Controllers\API\GreetingController;
 use App\Http\Controllers\API\OrderController;
 use App\Jobs\ProcessPoints;
-use App\Models\Demandtype;
 use App\Models\Employee;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
-use App\Models\Ranking;
-use App\Models\Shift;
-use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,10 +55,13 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
 
 
     });
-    Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
+    Route::get('greeting', [GreetingController::class, 'show']);
+    Route::get('faqs', [FAQController::class, 'index']);
+    //Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']);
 
     Route::get('/infoblaetter/{year}/{month}.pdf', [InfoblattController::class, 'getInfoblatt'])->where(['year' => '[0-9]{4}', 'month' => '[0-9]{2}']);// download pdf
+    Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
 
 });
 
@@ -76,20 +72,11 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(function () {
-
-    
     Route::get('/employeesFromOrders', [OrderController::class, 'employeesFromOrders']);
-
-    Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
-    Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);
-    Route::post('/shifts/search', [ShiftsController::class, 'search']);
-    Route::post('/shifts/update-points', [ShiftsController::class, 'updatePoints']);
     Route::get('/orders', [OrderController::class, 'getOrders']);
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
-
-    
     Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
 });
 
@@ -102,9 +89,19 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(function () {
     Route::get('/login-logs', [LogController::class, 'loginLog']);
     Route::get('/access-logs', [LogController::class, 'accessLog']);
+    Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);
+    Route::post('/shifts/search', [ShiftsController::class, 'search']);
+    Route::post('/shifts/update-points', [ShiftsController::class, 'updatePoints']);
 
-    Route::apiResource("demandtypes", DemandtypesController::class);
     Route::apiResource("rewards", RewardsController::class);
+    Route::patch('greeting', [GreetingController::class, 'update']);
+    Route::post('faqs/{id?}', [FAQController::class, 'storeOrUpdate']);
+    Route::delete('faqs/{id}', [FAQController::class, 'destroy']);
+
+    Route::post('/employees/make-admin/{id}', [EmployeesController::class, 'makeAdmin']);
+    Route::post('/employees/make-moderator/{id}', [EmployeesController::class, 'makeMod']);
+    Route::post('/employees/{id}/remove-roles', [EmployeesController::class, 'removeAllRoles']);
+
 });
 
 
@@ -132,13 +129,3 @@ Route::get('startRankingCalculation',function(Request $request){
     $year = 2024;
     EmployeesController::calculateRankings($year);
 });
-
-/*
-    Route::prefix('multiplications')->group(function () {
-        Route::get('/', [MultiplicationController::class, 'index']);
-        Route::get('/{id}', [MultiplicationController::class, 'show']);
-        Route::post('/', [MultiplicationController::class, 'store']);
-        Route::put('/{id}', [MultiplicationController::class, 'update']);
-        Route::delete('/{id}', [MultiplicationController::class, 'destroy']);
-    });
-*/

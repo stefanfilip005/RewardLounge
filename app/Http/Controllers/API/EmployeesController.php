@@ -388,4 +388,71 @@ class EmployeesController extends Controller
 
     }
 
+
+    public function makeAdmin($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->isModerator = false;
+        $employee->isAdministrator = true;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee role updated successfully',
+            'isAdministrator' => $employee->isAdministrator,
+        ]);
+    }
+    public function makeMod($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->isModerator = true;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee role updated successfully',
+            'isModerator' => $employee->isModerator,
+        ]);
+    }
+
+    public function removeAllRoles($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+    
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+    
+        // Assuming 'isAdministrator' is the only role field, set it to false
+        $employee->isModerator = false;
+        $employee->isAdministrator = false;
+        $employee->save();
+    
+        return response()->json(['message' => 'All roles have been removed from the employee']);
+    }
+
+
+
+
+
+
+
+
+
 }

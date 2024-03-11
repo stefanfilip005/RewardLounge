@@ -19,13 +19,10 @@ class InfoblattController extends Controller
 
     public function getInfoblatt($year, $month)
     {
-        // Path to the PDF file in storage
         $filePath = 'public/infoblaetter/' . $year . '/' . $month . '.pdf';
-        // Check if the file exists
         if (!Storage::exists($filePath)) {
             return response()->json(['message' => 'File not found'], 404);
         }
-        // Return the PDF file
         return Response::file(storage_path('app/' . $filePath));
     }
 
@@ -37,14 +34,13 @@ class InfoblattController extends Controller
             'year' => 'required|string|max:4',
         ]);
     
-        $year = $request->year; // Or determine the year based on your application logic
+        $year = $request->year;
         $month = $request->month;
         $file = $request->file('file');
     
-        $path = $file->storeAs("infoblaetter/{$year}", "{$month}.pdf", 'public'); // Change 'public' to your desired disk
+        $path = $file->storeAs("infoblaetter/{$year}", "{$month}.pdf", 'public');
     
-        // Update or create the Infoblatt record
-        $infoblatt = Infoblatt::updateOrCreate(
+        Infoblatt::updateOrCreate(
             ['year' => $year],
             ['m'.$month => $path]
         );
