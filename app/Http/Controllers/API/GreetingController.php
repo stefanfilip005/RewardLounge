@@ -10,8 +10,13 @@ class GreetingController extends Controller
 {
     public function show()
     {
-        $greeting = Greeting::firstOrFail();
-        return response()->json($greeting);
+        $greeting = Greeting::first();
+
+        if ($greeting) {
+            return response()->json($greeting);
+        } else {
+            return response()->json("", 200);
+        }
     }
 
     public function update(Request $request)
