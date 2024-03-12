@@ -66,7 +66,7 @@
             <p>Gesamtkosten deiner Bestellung: {{ $order->total_points }} Punkte</p>
         </div>
         <div class="footer">
-            Datum: {{ date('d.m.Y H.M.') }}<br>
+            Datum: {{ date('d.m.Y H:i') }}<br>
             <a href="https://intern.rkhl.at" style="color: #333333; text-decoration: none;">intern.rkhl.at</a>
         </div>
     </div>
