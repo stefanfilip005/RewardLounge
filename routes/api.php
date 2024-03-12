@@ -34,7 +34,7 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
         Route::get("user-profile", [EmployeesController::class, 'userProfile']);
         Route::get("ranking", [EmployeesController::class, 'selfRanking']);
 
-        Route::apiResource('rewards', RewardsController::class)->only(['index', 'show']);
+        Route::apiResource('rewards', RewardsController::class);
 
         Route::get("shifts", [EmployeesController::class, 'selfShifts']);
         Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
@@ -103,7 +103,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::post('/employees/make-moderator/{id}', [EmployeesController::class, 'makeMod']);
     Route::post('/employees/{id}/remove-roles', [EmployeesController::class, 'removeAllRoles']);
 
-    Route::apiResource('rewards', RewardsController::class)->except(['index', 'show']);
+    //Route::apiResource('rewards', RewardsController::class)->except(['index', 'show']);
 });
 
 
