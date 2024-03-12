@@ -53,19 +53,20 @@
             Rotes Kreuz Hollabrunn - Intern
         </div>
         <div class="body">
-            <p>Liebe Kolleginnen und Kollegen,</p>
-            <p>Bestellung: {{ $order->id }}</p>
-            <p>Kunde: {{ $order->remoteId }}</p>
+            <p>Liebe Moderatoren und Admins!</p>
+            <p>Soeben ist eine neue Bestellung mit den folgenden Details bei uns eingegangen: </p>
+            <p>Bestellnummer: {{ $order->id }}</p>
+            <p>Personalnummer: {{ $order->remoteId }}</p>
             <p>Zusammenfassung der Bestellung:</p>
             <ul>
                 @foreach($order->orderItems as $item)
                     <li>{{ $item->quantity }} x {{ $item->name }} [{{ $item->points }} Punkte]</li>
                 @endforeach
             </ul>
-            <p>Gesamtpunkte: {{ $order->total_points }}</p>
+            <p>Gesamtkosten der Bestellung: {{ $order->total_points }} Punkte</p>
         </div>
         <div class="footer">
-            Datum: {{ date('d.m.Y') }}<br>
+            Datum: {{ date('d.m.Y H:i') }}<br>
             <a href="https://intern.rkhl.at" style="color: #333333; text-decoration: none;">intern.rkhl.at</a>
         </div>
     </div>
