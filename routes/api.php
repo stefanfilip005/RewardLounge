@@ -102,8 +102,8 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::post('/employees/make-admin/{id}', [EmployeesController::class, 'makeAdmin']);
     Route::post('/employees/make-moderator/{id}', [EmployeesController::class, 'makeMod']);
     Route::post('/employees/{id}/remove-roles', [EmployeesController::class, 'removeAllRoles']);
-    
-    Route::apiResource('rewards', RewardsController::class)->except(['index', 'show'])
+
+    Route::apiResource('rewards', RewardsController::class)->except(['index', 'show']);
 });
 
 
