@@ -34,6 +34,10 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
         Route::get("user-profile", [EmployeesController::class, 'userProfile']);
         Route::get("ranking", [EmployeesController::class, 'selfRanking']);
 
+        
+        Route::get('rewards', [RewardsController::class, 'index']);
+        Route::get('rewards/{reward}', [RewardsController::class, 'show']);
+
         Route::get("shifts", [EmployeesController::class, 'selfShifts']);
         Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
         Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
@@ -93,7 +97,6 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::post('/shifts/search', [ShiftsController::class, 'search']);
     Route::post('/shifts/update-points', [ShiftsController::class, 'updatePoints']);
 
-    Route::apiResource("rewards", RewardsController::class);
     Route::patch('greeting', [GreetingController::class, 'update']);
     Route::post('faqs/{id?}', [FAQController::class, 'storeOrUpdate']);
     Route::delete('faqs/{id}', [FAQController::class, 'destroy']);
@@ -102,6 +105,9 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::post('/employees/make-moderator/{id}', [EmployeesController::class, 'makeMod']);
     Route::post('/employees/{id}/remove-roles', [EmployeesController::class, 'removeAllRoles']);
 
+    Route::post('rewards', [RewardsController::class, 'store']);
+    Route::put('rewards/{reward}', [RewardsController::class, 'update']);
+    Route::delete('rewards/{reward}', [RewardsController::class, 'destroy']);
 });
 
 
