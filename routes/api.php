@@ -67,6 +67,14 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     Route::get('/infoblaetter/{year}/{month}.pdf', [InfoblattController::class, 'getInfoblatt'])->where(['year' => '[0-9]{4}', 'month' => '[0-9]{2}']);// download pdf
     Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
 
+
+    // With the below 2 routes the idea was, that an employee can see the ranking of all, but anonymized (with the internal auto increment id as key)
+    // However, with this method someone could still look into the rps, compare the shifts with the shiftsForRanking and match the names to the internal ids
+    // Which would result in a complete deanonymization
+    // If we would like this, then we need to make a shiftResource without start,end,lastPointCalculation
+    Route::get("employeesForRanking", [EmployeesController::class, 'getEmployeesForRanking']);
+    Route::get("shiftsForRanking", [EmployeesController::class, 'getShiftsForRanking']);
+
 });
 
 
@@ -91,6 +99,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(function () {
+    Route::get('allRewards', [RewardsController::class, 'indexAll']);
     Route::get('/login-logs', [LogController::class, 'loginLog']);
     Route::get('/access-logs', [LogController::class, 'accessLog']);
     Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);

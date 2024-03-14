@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Employee;
 use App\Http\Requests\EmployeeRequest;
+use App\Http\Resources\EmployeePublicResource;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\RankingResource;
+use App\Http\Resources\ShiftPublicResource;
 use App\Http\Resources\ShiftResource;
 use App\Http\Resources\StatisticShiftResource;
 use App\Models\Ranking;
@@ -24,26 +26,32 @@ class EmployeesController extends Controller
      */
     public function index(Request $request)
     {
-        $employees = [];
-        if($request->filled('hasPoints')){
-            if($request->sortMode == 0){
-                $employees = Employee::where('points','>',0)->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
-            }else if($request->sortMode == 1){
-                $employees = Employee::where('points','>',0)->orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
+        $employees = Employee::paginate(20000);
+        foreach($employees as $employee){
+            if($employee->remoteId == $request->user()->remoteId){
+                $employee->self = true;
             }else{
-                $employees = Employee::where('points','>',0)->orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
-            }
-        }else{
-            if($request->sortMode == 0){
-                $employees = Employee::orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
-            }else if($request->sortMode == 1){
-                $employees = Employee::orderBy('points','desc')->orderBy('shifts','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
-            }else{
-                $employees = Employee::orderBy('shifts','desc')->orderBy('points','desc')->orderBy('lastname','asc')->orderBy('firstname','asc')->orderBy('remoteId','asc')->paginate(10000);
+                $employee->self = false;
             }
         }
         return EmployeeResource::collection($employees);
     }
+
+
+    public function getEmployeesForRanking(Request $request)
+    {
+        $employees = Employee::paginate(20000);
+        foreach($employees as $employee){
+            if($employee->remoteId == $request->user()->remoteId){
+                $employee->self = true;
+            }else{
+                $employee->self = false;
+            }
+        }
+        return EmployeePublicResource::collection($employees);
+    }
+    
+
 
     public function teamEmployees(Request $request)
     {
@@ -177,6 +185,42 @@ class EmployeesController extends Controller
         }
         return ShiftResource::collection($shifts);
     }
+
+    public function getShiftsForRanking(Request $request){
+        $shifts = null;
+        if(isset($request->year)) {
+            $year = $request->year;
+            $shifts = Shift::whereIn('location',[38,39])
+                ->whereYear('start', $year)
+                ->where('demandType', 'NOT LIKE', 'KFZ%')
+                ->where('points','>',0)
+                ->get();
+        }
+
+        $employees = Employee::all();
+        $employeeMap = array();
+        foreach($employees as $employee){
+            $employeeMap[$employee->remoteId] = $employee;
+        }
+
+        foreach($shifts as $shift){
+            $shift->employeeId = $employeeMap[$shift->employeeId]->id;
+
+            $start = Carbon::parse($shift->start);
+            $end = Carbon::parse($shift->end);
+            $durationInMinutes = $end->diffInMinutes($start);
+            $fictiveStart = Carbon::create($start->year, 1, 1, 12, 0, 0);
+            $fictiveEnd = $fictiveStart->copy()->addMinutes($durationInMinutes);
+            $shift->start = $fictiveStart->toDateTimeString();
+            $shift->end = $fictiveEnd->toDateTimeString();
+        }
+
+        return ShiftPublicResource::collection($shifts);
+    }
+
+    
+
+
     public function shiftStatistics(Request $request){
         $shifts = null;
         if(isset($request->year)) {

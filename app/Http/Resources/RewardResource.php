@@ -46,6 +46,7 @@ class RewardResource extends JsonResource
 			'euro' => $this->euro,
 			'valid_from' => $this->valid_from,
 			'valid_to' => $this->valid_to,
+			'is_active' => $this->is_active,
         ];
     }
 }

@@ -18,9 +18,16 @@ class RewardsController extends Controller
      */
     public function index()
     {
+        $rewards = Reward::where('is_active',true)->paginate(500);
+        return RewardResource::collection($rewards);
+    }
+
+    public function indexAll()
+    {
         $rewards = Reward::paginate(500);
         return RewardResource::collection($rewards);
     }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -121,6 +128,7 @@ class RewardsController extends Controller
 		$reward->name = $request->input('name');
 		$reward->slogan = $request->input('slogan');
 		$reward->description = $request->input('description');
+		$reward->is_active = $request->input('is_active');
 
         if ($request->has('src1')) {
             $base64Image = $request->input('src1');
