@@ -96,7 +96,12 @@ class GrabFutureOpenShifts extends Command
                 }
             }
             FutureOpenShift::truncate();
-            FutureOpenShift::insert($allShifts);
+            $chunkSize = 100;
+            $chunks = array_chunk($allShifts, $chunkSize);
+
+            foreach ($chunks as $chunk) {
+                FutureOpenShift::insert($chunk);
+            }
         }
     }
 }
