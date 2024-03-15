@@ -77,7 +77,7 @@ class GrabEmployees extends Command
             Employee::upsert($employees,['remoteId'],['firstname','lastname','email','phone']);
         }
 
-
+/*
         $employees = Employee::get();
         foreach($employees as $employee){
             // GetMAData
@@ -107,7 +107,7 @@ class GrabEmployees extends Command
                 $employee->save();
             }
             usleep(200000); // 0.2 seconds
-        }
+        }*/
 
     }
 }

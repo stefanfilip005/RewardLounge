@@ -23,6 +23,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:calculatePoints')->dailyAt('02:15');
         $schedule->command('command:calculateRanking')->dailyAt('02:25');
 
+        $schedule->command('command:grabEmployeePictures')->monthly();
     }
 
     /**
