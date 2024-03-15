@@ -32,6 +32,7 @@ class EmployeeResource extends JsonResource
 			'isModerator' => $this->isModerator ? true : false,
 			'isDeveloper' => $this->isDeveloper ? true : false,
 			'showNameInRanking' => $this->showNameInRanking,
+			'picture_base64' => $this->picture_base64,
         ];
     }
 }
