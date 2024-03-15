@@ -81,6 +81,9 @@ class GrabFutureOpenShifts extends Command
                 $shiftData = json_decode($return, true);
                 if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
                     foreach($shiftData['data']['plan'] as $row){
+                        if($row['AbteilungId'] != 38 || $row['AbteilungId'] != 39){
+                            continue;
+                        }
                         if(!isset($row['ObjektId']) || strlen($row['ObjektId']) == 0){
                             // This shift is still open to take
                             
