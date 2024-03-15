@@ -45,6 +45,30 @@ class GrabFutureOpenShifts extends Command
     {
         $allShifts = array();
 
+        $validKlasses = array();
+        //DF
+        $validKlasses[] = 'DF1';
+
+        //NEF
+        $validKlasses[] = 'FNB_NEF';
+
+        //RTW
+        $validKlasses[] = 'FRB';
+        $validKlasses[] = 'FRC';
+        $validKlasses[] = 'SR1';
+
+        //KTW
+        $validKlasses[] = 'FKB';
+        $validKlasses[] = 'FKC';
+        $validKlasses[] = 'FKB-B';
+        $validKlasses[] = 'SK1';
+
+        //BKTW
+        $validKlasses[] = 'FBB';
+
+        
+        
+
         $apicall = array();
         $apicall['req'] = 'RPS_PLAENE';
 
@@ -64,7 +88,7 @@ class GrabFutureOpenShifts extends Command
             foreach($plans['data'] as $plan){
                 $apicall['req'] = 'RPS';
                 $apicall['von'] = date('Y-m-d');
-                $apicall['bis'] = date("Y-m-d", strtotime('+28 days'));
+                $apicall['bis'] = date("Y-m-d", strtotime('+14 days'));
                 $apicall['rpsid'] = $plan['id_rps'];
             
                 $ch = curl_init();
@@ -82,6 +106,9 @@ class GrabFutureOpenShifts extends Command
                 if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
                     foreach($shiftData['data']['plan'] as $row){
                         if($row['AbteilungId'] != 38 && $row['AbteilungId'] != 39){
+                            continue;
+                        }
+                        if(!in_array($row['KlassId'], $validKlasses)){
                             continue;
                         }
                         if(!isset($row['ObjektId']) || strlen($row['ObjektId']) == 0){
