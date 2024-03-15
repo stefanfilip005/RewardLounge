@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Demandtype;
 use App\Models\Employee;
+use App\Models\futureOpenShift;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -42,6 +43,8 @@ class GrabFutureOpenShifts extends Command
      */
     public function handle()
     {
+        $allShifts = array();
+
         $apicall = array();
         $apicall['req'] = 'RPS_PLAENE';
 
@@ -78,13 +81,23 @@ class GrabFutureOpenShifts extends Command
                 $shiftData = json_decode($return, true);
                 if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
                     foreach($shiftData['data']['plan'] as $row){
-
-                        print_r($row);
-                        echo "\n";
+                        if(!isset($row['ObjektId']) || strlen($row['ObjektId']) == 0){
+                            // This shift is still open to take
+                            
+                            $shift = array(
+                                'start' => Carbon::parse($row['Beginn'], 'Europe/Vienna'),
+                                'end' => Carbon::parse($row['Ende'], 'Europe/Vienna'),
+                                'demandType' => $row['KlassId'],
+                                'shiftType' => $row['DienstartBeschreibung'],
+                                'location' => $plan['AbteilungId']
+                            );
+                            $allShifts[] = $shift;
+                        }
                     }
                 }
             }
-
+            futureOpenShift::delete();
+            futureOpenShift::insert($allShifts);
         }
     }
 }
