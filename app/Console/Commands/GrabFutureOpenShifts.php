@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Demandtype;
 use App\Models\Employee;
-use App\Models\futureOpenShift;
+use App\Models\FutureOpenShift;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -96,8 +96,8 @@ class GrabFutureOpenShifts extends Command
                     }
                 }
             }
-            futureOpenShift::delete();
-            futureOpenShift::insert($allShifts);
+            FutureOpenShift::delete();
+            FutureOpenShift::insert($allShifts);
         }
     }
 }
