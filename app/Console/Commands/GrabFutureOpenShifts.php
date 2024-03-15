@@ -96,7 +96,7 @@ class GrabFutureOpenShifts extends Command
                     }
                 }
             }
-            FutureOpenShift::delete();
+            FutureOpenShift::truncate();
             FutureOpenShift::insert($allShifts);
         }
     }
