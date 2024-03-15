@@ -18,7 +18,6 @@ class CreateFutureOpenShiftsTable extends Migration
 			$table->datetime('start');
 			$table->datetime('end');
 			$table->string('demandType');
-			$table->string('shiftType');
 			$table->unsignedBigInteger('location');
             $table->timestamps();
         });

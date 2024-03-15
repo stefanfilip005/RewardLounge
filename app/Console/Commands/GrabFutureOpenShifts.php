@@ -88,7 +88,6 @@ class GrabFutureOpenShifts extends Command
                                 'start' => Carbon::parse($row['Beginn'], 'Europe/Vienna'),
                                 'end' => Carbon::parse($row['Ende'], 'Europe/Vienna'),
                                 'demandType' => $row['KlassId'],
-                                'shiftType' => $row['DienstartBeschreibung'],
                                 'location' => $row['AbteilungId']
                             );
                             $allShifts[] = $shift;
