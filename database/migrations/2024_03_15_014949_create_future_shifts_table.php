@@ -26,7 +26,7 @@ class CreateFutureShiftsTable extends Migration
             $table->integer('Teil')->nullable();
             $table->string('Verwendung')->nullable();
             $table->string('Schicht')->nullable();
-            $table->bigInteger('Id')->nullable();
+            $table->bigInteger('RemoteId')->nullable();
             $table->string('KlassId')->nullable();
             $table->boolean('IstVollst')->nullable();
             $table->dateTime('Datum')->nullable();
