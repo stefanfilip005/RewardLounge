@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Demandtype;
 use App\Models\Employee;
 use App\Models\FutureOpenShift;
+use App\Models\FutureShift;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -105,33 +106,55 @@ class GrabFutureOpenShifts extends Command
                 $shiftData = json_decode($return, true);
                 if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
                     foreach($shiftData['data']['plan'] as $row){
-                        if($row['AbteilungId'] != 38 && $row['AbteilungId'] != 39){
-                            continue;
-                        }
-                        if(!in_array($row['KlassId'], $validKlasses)){
-                            continue;
-                        }
-                        if(!isset($row['ObjektId']) || strlen($row['ObjektId']) == 0){
-                            // This shift is still open to take
-                            
-                            $shift = array(
-                                'start' => Carbon::parse($row['Beginn'], 'Europe/Vienna'),
-                                'end' => Carbon::parse($row['Ende'], 'Europe/Vienna'),
-                                'demandType' => $row['KlassId'],
-                                'location' => $row['AbteilungId']
-                            );
-                            $allShifts[] = $shift;
-                        }
+                        $shift = [
+                            'Teil' => $row['Teil'] ?? null,
+                            'Verwendung' => $row['Verwendung'] ?? null,
+                            'Schicht' => $row['Schicht'] ?? null,
+                            'RemoteId' => $row['Id'] ?? null,
+                            'KlassId' => $row['KlassId'] ?? null,
+                            'IstVollst' => $row['IstVollst'] ?? null,
+                            'Datum' => $row['Datum'] ?? null,
+                            'Beginn' => $row['Beginn'] ?? null,
+                            'Ende' => $row['Ende'] ?? null,
+                            'PoolBeginn' => $row['PoolBeginn'] ?? null,
+                            'PoolEnde' => $row['PoolEnde'] ?? null,
+                            'Bezeichnung' => $row['Bezeichnung'] ?? null,
+                            'ObjektId' => $row['ObjektId'] ?? null,
+                            'ObjektBezeichnung1' => $row['ObjektBezeichnung1'] ?? null,
+                            'ObjektBezeichnung2' => $row['ObjektBezeichnung2'] ?? null,
+                            'ObjektInfo' => $row['ObjektInfo'] ?? null,
+                            'PlanInfo' => $row['PlanInfo'] ?? null,
+                            'IstForderer' => $row['IstForderer'] ?? null,
+                            'VaterId' => $row['VaterId'] ?? null,
+                            'IstOptional' => $row['IstOptional'] ?? null,
+                            'PoolId' => $row['PoolId'] ?? null,
+                            'PoolTeil' => $row['PoolTeil'] ?? null,
+                            'DienstartId' => $row['DienstartId'] ?? null,
+                            'DienstartBeschreibung' => $row['DienstartBeschreibung'] ?? null,
+                            'ChgUserAnzeigename' => $row['ChgUserAnzeigename'] ?? null,
+                            'ChgUserLoginname' => $row['ChgUserLoginname'] ?? null,
+                            'ChgDate' => $row['ChgDate'] ?? null,
+                            'AbteilungId' => $row['AbteilungId'] ?? null,
+                            'AbteilungBezeichnung' => $row['AbteilungBezeichnung'] ?? null,
+                            'AbteilungKZ' => $row['AbteilungKZ'] ?? null,
+                            'Info' => $row['Info'] ?? null,
+                            'TimeStamp' => $row['TimeStamp'] ?? null,
+                            'Processed' => $row['Processed'] ?? null,
+                            'MessageSent' => $row['MessageSent'] ?? null,
+                        ];
+                        $allShifts[] = $shift;
                     }
                 }
             }
-            FutureOpenShift::truncate();
+            
+            FutureShift::truncate();
             $chunkSize = 100;
             $chunks = array_chunk($allShifts, $chunkSize);
 
             foreach ($chunks as $chunk) {
-                FutureOpenShift::insert($chunk);
+                FutureShift::insert($chunk);
             }
+            
         }
     }
 }

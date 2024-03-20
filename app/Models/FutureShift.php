@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FutureOpenShift extends Model
+class FutureShift extends Model
 {
     use HasFactory;
-    protected $table = 'futureOpenShifts';
+    protected $table = 'futureShifts';
 }
