@@ -18,6 +18,7 @@ class EmployeeResource extends JsonResource
         return
         [
 			'anonym' => false,
+            'public' => false,
 			'self' => $this->self,
 			'remoteId' => $this->remoteId,
 			'firstname' => $this->firstname,

@@ -14,12 +14,22 @@ class EmployeePublicResource extends JsonResource
      */
     public function toArray($request)
     {
-        //return parent::toArray($request);
-        return
-        [
-			'remoteId' => $this->id,
-			'self' => $this->self,
-			'anonym' => true,
+        $data = [
+            'remoteId' => $this->id,
+            'self' => $this->self,
+            'public' => true,
+            'anonym' => !$this->showNameInRanking,
         ];
+
+        // Include name and admin flags if not anonym
+        if (!$data['anonym']) {
+            $data['firstname'] = $this->firstname;
+            $data['lastname'] = $this->lastname;
+            $data['isAdministrator'] = $this->isAdministrator;
+            $data['isModerator'] = $this->isModerator;
+            $data['isDeveloper'] = $this->isDeveloper;
+        }
+
+        return $data;
     }
 }

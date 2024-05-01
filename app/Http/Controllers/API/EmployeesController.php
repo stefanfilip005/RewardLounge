@@ -63,11 +63,7 @@ class EmployeesController extends Controller
     {
         $employees = Employee::paginate(20000);
         foreach($employees as $employee){
-            if($employee->remoteId == $request->user()->remoteId){
-                $employee->self = true;
-            }else{
-                $employee->self = false;
-            }
+            $employee->self = $employee->remoteId == $request->user()->remoteId;
         }
         return EmployeePublicResource::collection($employees);
     }
