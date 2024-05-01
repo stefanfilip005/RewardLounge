@@ -37,6 +37,27 @@ class EmployeesController extends Controller
         return EmployeeResource::collection($employees);
     }
 
+    public function myConfig(Request $request){
+        $user = $request->user();
+        return response()->json([
+            'showNameInRanking' => $user->showNameInRanking
+        ]);
+    }
+    public function saveConfig(Request $request){
+        $user = $request->user();
+        $validated = $request->validate([
+            'showNameInRanking' => 'required|boolean',
+        ]);
+        
+        $user->showNameInRanking = $validated['showNameInRanking'];
+        
+        if ($user->save()) {
+            return response()->json(['success' => true, 'showNameInRanking' => $user->showNameInRanking]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to update configuration'], 500);
+        }
+    }
+
 
     public function getEmployeesForRanking(Request $request)
     {

@@ -34,6 +34,8 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
         Route::get("user-profile", [EmployeesController::class, 'userProfile']);
         Route::get("ranking", [EmployeesController::class, 'selfRanking']);
 
+        Route::get('employees/config', [EmployeesController::class, 'myConfig']);
+        Route::post('employees/config', [EmployeesController::class, 'saveConfig']);
         
 
         Route::get("shifts", [EmployeesController::class, 'selfShifts']);
