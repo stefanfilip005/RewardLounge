@@ -47,6 +47,7 @@ class RewardResource extends JsonResource
 			'valid_from' => $this->valid_from,
 			'valid_to' => $this->valid_to,
 			'is_active' => $this->is_active,
+            'comment_required' => $this->comment_required,
         ];
     }
 }

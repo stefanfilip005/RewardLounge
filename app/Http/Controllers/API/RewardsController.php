@@ -41,6 +41,8 @@ class RewardsController extends Controller
 		$reward->name = $request->input('name');
 		$reward->slogan = $request->input('slogan');
 		$reward->description = $request->input('description');
+        $reward->comment_required = $request->input('comment_required', false);
+
 
         if ($request->has('src1')) {
             $base64Image = $request->input('src1');
@@ -129,6 +131,7 @@ class RewardsController extends Controller
 		$reward->slogan = $request->input('slogan');
 		$reward->description = $request->input('description');
 		$reward->is_active = $request->input('is_active');
+        $reward->comment_required = $request->input('comment_required', false);
 
         if ($request->has('src1')) {
             $base64Image = $request->input('src1');

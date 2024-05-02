@@ -11,13 +11,13 @@ class FAQController extends Controller
 {
     public function index()
     {
-        $faqs = FAQ::all();
+        $faqs = FAQ::orderBy('sort_order', 'asc')->get();
         return FAQResource::collection($faqs);
     }
 
     public function storeOrUpdate(Request $request, $id = null)
     {
-        $faq = FAQ::updateOrCreate(['id' => $id], $request->only(['question', 'answer']));
+        $faq = FAQ::updateOrCreate(['id' => $id], $request->only(['question', 'answer','sort_order']));
         return new FAQResource($faq);
     }
 
