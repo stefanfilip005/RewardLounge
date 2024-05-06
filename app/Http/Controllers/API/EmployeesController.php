@@ -16,6 +16,7 @@ use App\Models\Ranking;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class EmployeesController extends Controller
 {
@@ -89,9 +90,11 @@ class EmployeesController extends Controller
         return new EmployeeResource($employee);
     }
 
+    
     public function userProfile(Request $request){
         return EmployeeResource::make($request->user());
     }
+    
 
     public function selfRanking(Request $request){
         $userID = $request->user()->remoteId;
@@ -146,16 +149,32 @@ class EmployeesController extends Controller
         }
         return RankingResource::collection($rankings);
     }
-    public function selfShifts(Request $request){
+
+
+
+
+
+    public function selfShifts(Request $request) {
         $userID = $request->user()->remoteId;
-        //$userID = 228242;
-        if(isset($request->year)) {
+        if (isset($request->year)) {
             $year = $request->year;
-            $shifts = Shift::where('employeeId',$userID)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
-            //$shifts = Shift::where('employeeId',228242)->whereYear('start', $year)->orderBy('start','asc')->paginate(5000);
+            $cacheKey = 'shifts:' . $userID . ':' . $request->year;
+            $shifts = Redis::get($cacheKey);
+            if (!$shifts) {
+                $shifts = Shift::where('employeeId', $userID)
+                    ->whereYear('start', $year)
+                    ->orderBy('start', 'asc')
+                    ->paginate(5000);
+                Redis::setex($cacheKey, 60 * 60 * 24, serialize($shifts));
+            } else {
+                $shifts = unserialize($shifts);
+            }
+            if ($shifts->isEmpty()) {
+                $shifts = [];
+            }
         }
         return ShiftResource::collection($shifts);
-    }    
+    }
     
     
     public function futureShifts(Request $request){
@@ -184,6 +203,8 @@ class EmployeesController extends Controller
 		curl_close($ch);
 		return $response;
 	}
+
+
 
     public function latestShifts(Request $request){
         $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','desc')->paginate(25);

@@ -8,12 +8,22 @@ use App\Models\Infoblatt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redis;
 
 class InfoblattController extends Controller
 {
+    const INFOBLAETTER_CACHE_PREFIX = 'infoblaetter:';
+
     public function getInfoblaetter($year)
     {
-        $infoblaetter = Infoblatt::where('year', $year)->get();
+        $cacheKey = self::INFOBLAETTER_CACHE_PREFIX . $year;
+        $infoblaetter = Redis::get($cacheKey);
+        if (!$infoblaetter) {
+            $infoblaetter = Infoblatt::where('year', $year)->get();
+            Redis::setex($cacheKey, 86400*7, json_encode($infoblaetter));
+        } else {
+            $infoblaetter = json_decode($infoblaetter);
+        }
         return InfoblattResource::collection($infoblaetter);
     }
 
@@ -44,6 +54,10 @@ class InfoblattController extends Controller
             ['year' => $year],
             ['m'.$month => $path]
         );
+
+        $cacheKey = self::INFOBLAETTER_CACHE_PREFIX . $year;
+        $infoblaetter = Infoblatt::where('year', $year)->get();
+        Redis::setex($cacheKey, 86400*7, json_encode($infoblaetter));
     
         return response()->json(['message' => 'File uploaded successfully.', 'path' => $path]);
     }

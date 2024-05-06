@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
         Route::post('employees/config', [EmployeesController::class, 'saveConfig']);
         
 
-        Route::get("shifts", [EmployeesController::class, 'selfShifts']);
+        Route::get("shifts", [EmployeesController::class, 'selfShifts']); // Redis cached
         Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
         Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
 
@@ -61,10 +61,10 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     });
     Route::get('rewards', [RewardsController::class, 'index']);
     Route::get('rewards/{reward}', [RewardsController::class, 'show']);
-    Route::get('greeting', [GreetingController::class, 'show']);
+    Route::get('greeting', [GreetingController::class, 'show']); // Redis cached
     Route::get('faqs', [FAQController::class, 'index']);
     //Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
-    Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']);
+    Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']); // Redis cached
 
     Route::get('/infoblaetter/{year}/{month}.pdf', [InfoblattController::class, 'getInfoblatt'])->where(['year' => '[0-9]{4}', 'month' => '[0-9]{2}']);// download pdf
     Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
@@ -76,8 +76,10 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     // If we would like this, then we need to make a shiftResource without start,end,lastPointCalculation
     Route::get("employeesForRanking", [EmployeesController::class, 'getEmployeesForRanking']);
     Route::get("shiftsForRanking", [EmployeesController::class, 'getShiftsForRanking']);
-
 });
+
+
+
 
 
 /*
@@ -104,11 +106,11 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::get('allRewards', [RewardsController::class, 'indexAll']);
     Route::get('/login-logs', [LogController::class, 'loginLog']);
     Route::get('/access-logs', [LogController::class, 'accessLog']);
-    Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']);
+    Route::post('/infoblaetter/upload', [InfoblattController::class, 'upload']); // Redis cache will be updated
     Route::post('/shifts/search', [ShiftsController::class, 'search']);
     Route::post('/shifts/update-points', [ShiftsController::class, 'updatePoints']);
 
-    Route::patch('greeting', [GreetingController::class, 'update']);
+    Route::patch('greeting', [GreetingController::class, 'update']); // Redis cache will be updated
     Route::post('faqs/{id?}', [FAQController::class, 'storeOrUpdate']);
     Route::delete('faqs/{id}', [FAQController::class, 'destroy']);
 
