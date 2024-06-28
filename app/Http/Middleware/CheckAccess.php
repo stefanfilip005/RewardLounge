@@ -17,6 +17,7 @@ class CheckAccess
         'is.admin' => ['isAdministrator', 'isDeveloper'], // Admins and Developers
         'is.developer' => ['isDeveloper'], // Only Developers
         'is.moderator' => ['isAdministrator', 'isModerator', 'isDeveloper'], // All
+        'is.dienstfuehrer' => ['isAdministrator', 'isModerator', 'isDeveloper', 'isDienstfuehrer'], // DF
     ];
 
     /**

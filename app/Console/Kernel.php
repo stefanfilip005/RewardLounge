@@ -25,6 +25,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('cache:prefill-shifts')->dailyAt('02:50');
 
+        $schedule->command('employees:update-shift-date')->dailyAt('03:10');
+
         $schedule->command('command:grabEmployeePictures')->monthly();
     }
 

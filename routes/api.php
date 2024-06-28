@@ -80,6 +80,11 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
 
 
 
+Route::apiResource('questions', 'QuestionController');
+Route::post('questions/{question}/activate', 'QuestionController@activate');
+Route::post('questions/{question}/deactivate', 'QuestionController@deactivate');
+Route::apiResource('questions.answers', 'AnswerController')->shallow();
+Route::post('questions/{question}/answers/{answer}/respond', 'QuestionResponseController@store');
 
 
 /*
@@ -89,13 +94,20 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(function () {
     Route::get('/employeesFromOrders', [OrderController::class, 'employeesFromOrders']);
-    Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
     Route::get('/orders', [OrderController::class, 'getOrders']);
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
     Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
 });
 
+/*
+ * ----------------------------------------------------------------
+ * Protected - allowed for dienstfuehrer
+ * ----------------------------------------------------------------
+ */
+Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->group(function () {
+    Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
+});
 
 /*
  * ----------------------------------------------------------------

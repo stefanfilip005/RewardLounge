@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FutureShift extends Model
+class FutureOpenShift extends Model
 {
     use HasFactory;
-    protected $table = 'futureShifts';
+    protected $table = 'futureOpenShifts';
     protected $fillable = [
         'Teil', 'Verwendung', 'Schicht', 'RemoteId', 'KlassId', 'IstVollst',
         'Datum', 'Beginn', 'Ende', 'PoolBeginn', 'PoolEnde', 'Bezeichnung',
