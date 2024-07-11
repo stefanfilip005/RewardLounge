@@ -94,7 +94,6 @@ Route::post('questions/{question}/answers/{answer}/respond', 'QuestionResponseCo
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(function () {
     Route::get('/employeesFromOrders', [OrderController::class, 'employeesFromOrders']);
-    Route::get("shifts", [EmployeesController::class, 'shifts']);
     Route::get('/orders', [OrderController::class, 'getOrders']);
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
     Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
@@ -107,6 +106,9 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->group(function () {
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
+    Route::get("shifts", [EmployeesController::class, 'shifts']);
+    Route::get("shiftsForEmployee", [EmployeesController::class, 'shiftsForEmployee']);
+    Route::get("employeeFromId", [EmployeesController::class, 'employeeFromId']);
 });
 
 /*
@@ -128,6 +130,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
 
     Route::post('/employees/make-admin/{id}', [EmployeesController::class, 'makeAdmin']);
     Route::post('/employees/make-moderator/{id}', [EmployeesController::class, 'makeMod']);
+    Route::post('/employees/make-df/{id}', [EmployeesController::class, 'makeDf']);
     Route::post('/employees/{id}/remove-roles', [EmployeesController::class, 'removeAllRoles']);
 
     Route::post('rewards', [RewardsController::class, 'store']);

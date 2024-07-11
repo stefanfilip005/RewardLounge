@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class UpdateEmployeeShiftDate extends Command
 {
-    protected $signature = 'employees:update-shift-date {--full : Consider all shifts instead of the last week}';
+    protected $signature = 'command:employees-update-shift-date {--full : Consider all shifts instead of the last week}';
     protected $description = 'Updates each employee\'s last shift date based on the most recent shift';
 
     public function __construct()

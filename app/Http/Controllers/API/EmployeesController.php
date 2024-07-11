@@ -175,7 +175,34 @@ class EmployeesController extends Controller
         }
         return ShiftResource::collection($shifts);
     }
+    public function shiftsForEmployee(Request $request) {
+        $userID = $request->employeeId;
+        if (isset($request->year)) {
+            $year = $request->year;
+            $cacheKey = 'shifts:' . $userID . ':' . $request->year;
+            $shifts = Redis::get($cacheKey);
+            if (!$shifts) {
+                $shifts = Shift::where('employeeId', $userID)
+                    ->whereYear('start', $year)
+                    ->orderBy('start', 'asc')
+                    ->paginate(5000);
+                Redis::setex($cacheKey, 60 * 60 * 24, serialize($shifts));
+            } else {
+                $shifts = unserialize($shifts);
+            }
+            if ($shifts->isEmpty()) {
+                $shifts = [];
+            }
+        }
+        return ShiftResource::collection($shifts);
+    }
+    public function employeeFromId(Request $request) {
+        $employee = Employee::where('remoteId',$request->employeeId)->first();
+        return new EmployeeResource($employee);
+    }
+
     
+
     
     public function futureShifts(Request $request){
         $apicall = array();
@@ -484,6 +511,7 @@ class EmployeesController extends Controller
 
         $employee->isModerator = false;
         $employee->isAdministrator = true;
+        $employee->isDienstfuehrer = false;
         $employee->save();
 
         return response()->json([
@@ -503,13 +531,37 @@ class EmployeesController extends Controller
             ], 404);
         }
 
+        $employee->isAdministrator = false;
         $employee->isModerator = true;
+        $employee->isDienstfuehrer = false;
         $employee->save();
 
         return response()->json([
             'success' => true,
             'message' => 'Employee role updated successfully',
             'isModerator' => $employee->isModerator,
+        ]);
+    }
+    public function makeDf($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->isModerator = false;
+        $employee->isAdministrator = false;
+        $employee->isDienstfuehrer = true;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee role updated successfully',
+            'isDienstfuehrer' => $employee->isDienstfuehrer,
         ]);
     }
 
@@ -524,6 +576,7 @@ class EmployeesController extends Controller
         // Assuming 'isAdministrator' is the only role field, set it to false
         $employee->isModerator = false;
         $employee->isAdministrator = false;
+        $employee->isDienstfuehrer = false;
         $employee->save();
     
         return response()->json(['message' => 'All roles have been removed from the employee']);
