@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\OrderResource;
 use App\Jobs\ProcessPoints;
+use App\Mail\OrderReadyForTakeaway;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -75,6 +77,7 @@ class OrderController extends Controller
         }
 
         if ($newState == 0) {
+            //Offen
             $order->update([
                 'state' => $newState,
                 'state_1_datetime' => null, 'state_1_user_id' => null,
@@ -84,6 +87,7 @@ class OrderController extends Controller
                 'state_5_datetime' => null, 'state_5_user_id' => null,
             ]);
         } else if ($newState == 1) {
+            //In Prüfung (Nicht in Verwendung)
             $order->update([
                 'state' => $newState,
                 'state_1_datetime' => now(), 'state_1_user_id' => $user->remoteId,
@@ -93,6 +97,7 @@ class OrderController extends Controller
                 'state_5_datetime' => null, 'state_5_user_id' => null,
             ]);
         } else if ($newState == 2) {
+            //Ist Bestellt
             $order->update([
                 'state' => $newState,
                 'state_2_datetime' => now(), 'state_2_user_id' => $user->remoteId,
@@ -101,13 +106,20 @@ class OrderController extends Controller
                 'state_5_datetime' => null, 'state_5_user_id' => null,
             ]);
         } else if ($newState == 3) {
+            //Abholbereit
             $order->update([
                 'state' => $newState,
                 'state_3_datetime' => now(), 'state_3_user_id' => $user->remoteId,
                 'state_4_datetime' => null, 'state_4_user_id' => null,
                 'state_5_datetime' => null, 'state_5_user_id' => null,
             ]);
+
+            $employee = Employee::where('remoteId',$order->remoteId)->first();
+            if ($employee) {
+                Mail::to($employee->email)->send(new OrderReadyForTakeaway($order,$employee));
+            }
         } else if ($newState == 4) {
+            //Erledigt (Nicht in Verwendung)
             $order->update([
                 'state' => $newState,
                 'state_4_datetime' => now(), 'state_4_user_id' => $user->remoteId,
@@ -122,7 +134,7 @@ class OrderController extends Controller
                 'state_4_datetime' => null, 'state_4_user_id' => null,
                 'state_5_datetime' => now(), 'state_5_user_id' => $user->remoteId,
             ]);   
-        }         
+        }
         $employee = Employee::where('remoteId',$order->remoteId)->first();
         if ($employee) {
             ProcessPoints::dispatch($employee);

@@ -163,6 +163,7 @@ class CartController extends Controller
                     'src1' => $reward->src1,
                     'points' => $reward->points,
                     'euro' => $reward->euro,
+                    'article_number' => $reward->article_number,
                 ]);
             }
 
