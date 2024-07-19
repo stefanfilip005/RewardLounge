@@ -14,7 +14,7 @@ class AddArticleNumberToRewardsTable extends Migration
     public function up()
     {
         Schema::table('rewards', function (Blueprint $table) {
-            $table->string('article_number')->default(false); // Add a article_number flag
+            $table->string('article_number')->default(''); // Add a article_number flag
         });
     }
 
