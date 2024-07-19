@@ -48,6 +48,7 @@ class RewardResource extends JsonResource
 			'valid_to' => $this->valid_to,
 			'is_active' => $this->is_active,
             'comment_required' => $this->comment_required,
+            'article_number' => $this->article_number,
         ];
     }
 }

@@ -23,9 +23,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:calculatePoints')->dailyAt('02:20');
         $schedule->command('command:calculateRanking')->dailyAt('02:40');
 
-        $schedule->command('cache:prefill-shifts')->dailyAt('02:50');
+        $schedule->command('command:cache-prefill-shifts')->dailyAt('02:50');
 
-        $schedule->command('employees:update-shift-date')->dailyAt('03:10');
+        $schedule->command('command:employees-update-shift-date')->dailyAt('03:10');
 
         $schedule->command('command:grabEmployeePictures')->monthly();
     }

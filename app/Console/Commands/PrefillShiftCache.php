@@ -15,7 +15,7 @@ class PrefillShiftCache extends Command
      *
      * @var string
      */
-    protected $signature = 'cache:prefill-shifts';
+    protected $signature = 'command:cache-prefill-shifts';
 
     /**
      * The console command description.
