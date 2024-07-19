@@ -140,6 +140,14 @@ class CartController extends Controller
         if (!$cart) {
             return response()->json(['message' => 'Cart not found'], 404);
         }
+
+
+        foreach ($cart->items as $cartItem) {
+            if($cartItem->quantity <= 0){
+                return response()->json(['message' => 'Quantity must be greater than 0'], 400);
+            }
+        }
+
     
         DB::beginTransaction();
         try {
@@ -177,7 +185,7 @@ class CartController extends Controller
             $employee->save();
     
             DB::commit();
-            Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
+            //Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
 
             $employees = Employee::where('isModerator', true)->orWhere('isAdministrator', true)->orWhere('isDeveloper', true)->get(['email']);
             $teamEmails = array();
@@ -185,7 +193,7 @@ class CartController extends Controller
                 $teamEmails[] = $employeeMail->email;
             }
             foreach ($teamEmails as $teamEmail) {
-                Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
+                //Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
             }
 
             return response()->json(['message' => 'Order placed successfully'], 200);

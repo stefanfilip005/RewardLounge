@@ -268,9 +268,14 @@ class EmployeesController extends Controller
             $employeeMap[$employee->remoteId] = $employee;
         }
 
-        foreach($shifts as $shift){
+        foreach ($shifts as $key => $shift) {
+            $employeeType = $employeeMap[$shift->employeeId]->employeeType;
+            if (substr($employeeType, 0, 3) !== 'EA-') {
+                unset($shifts[$key]);
+                continue;
+            }
+            
             $shift->employeeId = $employeeMap[$shift->employeeId]->id;
-
             $start = Carbon::parse($shift->start);
             $end = Carbon::parse($shift->end);
             $durationInMinutes = $end->diffInMinutes($start);
