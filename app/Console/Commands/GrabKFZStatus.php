@@ -43,93 +43,44 @@ class GrabKFZStatus extends Command
     public function handle()
     {
 
-        $apicall = array();
-        $apicall['req'] = 'KFZStatus';
-        $apicall['funkkennung'] = '57-099';
+        $funkkennungen = [
+            '57-001',
+            '57-002',
+            '57-010',
+            '57-012',
+            '57-014',
+            '57-020',
+            '57-022',
+            '57-023',
+            '57-024',
+            '57-025',
+            '57-026',
+            '57-027',
+            '57-041',
+            '57-042',
+            '57-099',
+            '57-119',
+        ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-        $return = curl_exec ($ch);
-        if(strlen($return) < 5){
-            return;
+        foreach($funkkennungen as $kennung){
+            $apicall = array();
+            $apicall['req'] = 'KFZStatus';
+            $apicall['funkkennung'] = $kennung;
+    
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
+            $return = curl_exec ($ch);
+            if(strlen($return) < 5){
+                return;
+            }
+            $return = json_decode($return, true);
+    
+            print_r($return);
         }
-        $return = json_decode($return, true);
-
-        print_r($return);
-
-
-
-        $apicall = array();
-        $apicall['req'] = 'KFZStatus';
-        $apicall['funkkennung'] = '57-022';
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-        $return = curl_exec ($ch);
-        if(strlen($return) < 5){
-            return;
-        }
-        $return = json_decode($return, true);
-
-        print_r($return);
-
-
-
-
-
-        $apicall = array();
-        $apicall['req'] = 'KFZStatus';
-        $apicall['funkkennung'] = '57-020';
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-        $return = curl_exec ($ch);
-        if(strlen($return) < 5){
-            return;
-        }
-        $return = json_decode($return, true);
-
-        print_r($return);
-
-
-
-
-        $apicall = array();
-        $apicall['req'] = 'KFZStatus';
-        $apicall['funkkennung'] = '57-023';
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-        $return = curl_exec ($ch);
-        if(strlen($return) < 5){
-            return;
-        }
-        $return = json_decode($return, true);
-
-        print_r($return);
-
-
-
-
     }
 }
