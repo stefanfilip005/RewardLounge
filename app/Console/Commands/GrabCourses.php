@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Course;
 use App\Models\Employee;
 use App\Models\Shift;
 use Carbon\Carbon;
@@ -60,27 +61,29 @@ class GrabCourses extends Command
             return;
         }
         $return = json_decode($return, true);
+        Course::where('date', '>=', Carbon::now()->toDateString())->delete();
 
-        print_r($return);
 
-/*
         if(isset($return['data'])){
+            $courses = [];
+            $courseIds = [];  // Keep track of already processed course IDs to avoid duplicates
+
             foreach($return['data'] as $row){
-                $employeeId = $row['Personalnr'];
-                if(!in_array($employeeId,$employeeIds)){
-                    $employees[] = array(
-                        'remoteId' => $employeeId,
-                        'firstname' => $row['Vorname'],
-                        'lastname' => $row['Nachname'],
-                        'email' => $row['E-Mail'],
-                        'phone' => $row['Mobil']
+                $courseId = $row['ID'];
+                if(!in_array($courseId, $courseIds)){
+                    $courses[] = array(
+                        'course_id' => $courseId,
+                        'von' => $row['VON'],
+                        'bis' => $row['BIS'],
+                        'date' => $row['DATE'],
+                        'info' => $row['INFO'] ?? null,  // Use the null coalescing operator to handle non-existing indexes
+                        'name' => $row['NAME']
                     );
-                    $employeeIds[] = $employeeId;
+                    $courseIds[] = $courseId;
                 }
             }
-            Employee::upsert($employees,['remoteId'],['firstname','lastname','email','phone']);
-        }*/
-
+            Course::upsert($courses, ['course_id'], ['von', 'bis', 'date', 'info', 'name']);
+        }
 
     }
 }
