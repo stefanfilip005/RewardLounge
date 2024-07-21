@@ -185,7 +185,7 @@ class CartController extends Controller
             $employee->save();
     
             DB::commit();
-            //Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
+            Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
 
             $employees = Employee::where('isModerator', true)->orWhere('isAdministrator', true)->orWhere('isDeveloper', true)->get(['email']);
             $teamEmails = array();
@@ -193,7 +193,7 @@ class CartController extends Controller
                 $teamEmails[] = $employeeMail->email;
             }
             foreach ($teamEmails as $teamEmail) {
-                //Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
+                Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
             }
 
             return response()->json(['message' => 'Order placed successfully'], 200);
