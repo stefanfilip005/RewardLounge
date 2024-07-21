@@ -28,6 +28,9 @@ class EmployeeResource extends JsonResource
 			'points' => $this->points,
 			'shifts' => $this->shifts,
 			'lastPointCalculation' => $this->lastPointCalculation,
+            
+            'haupt' => $this->Mitarbeitertyp,
+            'Status' => $this->Status,
 
 			'isAdministrator' => $this->isAdministrator ? true : false,
 			'isModerator' => $this->isModerator ? true : false,

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+//use Carbon\Carbon;
 
 class EmployeePublicResource extends JsonResource
 {
@@ -14,11 +15,15 @@ class EmployeePublicResource extends JsonResource
      */
     public function toArray($request)
     {
+        //Carbon::setLocale('de');
         $data = [
             'remoteId' => $this->id,
             'self' => $this->self,
             'public' => true,
             'anonym' => !$this->showNameInRanking,
+            'haupt' => $this->Mitarbeitertyp,
+            'Status' => $this->Status,
+            //'last_shift_date' => $this->last_shift_date ? Carbon::createFromFormat('Y-m-d H:i:s', $this->last_shift_date)->isoFormat('MMMM Y') : null,
         ];
 
         // Include name and admin flags if not anonym
