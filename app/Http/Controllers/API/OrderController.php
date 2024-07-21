@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\OrderResource;
 use App\Jobs\ProcessPoints;
+use App\Mail\OrderPlacedForCustomer;
+use App\Mail\OrderPlacedForTeam;
 use App\Mail\OrderReadyForTakeaway;
 use App\Models\Employee;
 use App\Models\Order;
@@ -141,6 +143,24 @@ class OrderController extends Controller
         }
 
         return response()->json(['message' => 'Order state updated successfully.'], 200);
+    }
+
+
+    public function mailConfirmationAgain(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $employee = Employee::where('remoteId', $order->remoteId)->firstOrFail();
+        Mail::to($employee->email)->send(new OrderPlacedForCustomer($order));
+
+        $employees = Employee::where('isModerator', true)->orWhere('isAdministrator', true)->orWhere('isDeveloper', true)->get(['email']);
+        $teamEmails = array();
+        foreach ($employees as $employeeMail) {
+            $teamEmails[] = $employeeMail->email;
+        }
+        foreach ($teamEmails as $teamEmail) {
+            Mail::to($teamEmail)->send(new OrderPlacedForTeam($order));
+        }
     }
 
 

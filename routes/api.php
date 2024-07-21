@@ -99,6 +99,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::get('/orders', [OrderController::class, 'getOrders']);
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
     Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
+    Route::post('/order/{id}/mailConfirmationAgain', [OrderController::class, 'mailConfirmationAgain']);
 });
 
 /*
