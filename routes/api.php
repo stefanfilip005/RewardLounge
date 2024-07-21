@@ -38,9 +38,11 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
         Route::post('employees/config', [EmployeesController::class, 'saveConfig']);
         
 
-        Route::get("shifts", [EmployeesController::class, 'selfShifts']); // Redis cached
-        Route::get("latestShifts", [EmployeesController::class, 'latestShifts']);
-        Route::get("futureShifts", [EmployeesController::class, 'futureShifts']);
+        Route::get("shifts",        [EmployeesController::class, 'selfShifts']); // Redis cached
+        Route::get("latestShifts",  [EmployeesController::class, 'latestShifts']);
+        Route::get("futureShifts",  [EmployeesController::class, 'futureShifts']);
+        Route::get("courses",       [EmployeesController::class, 'courses']);
+        Route::get("mycourses",     [EmployeesController::class, 'myCourses']);
 
 
         Route::prefix('cart')->group(function () {

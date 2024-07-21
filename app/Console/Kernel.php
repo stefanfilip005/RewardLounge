@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('sanctum:prune-expired --hours=12')->daily();
 
         // $schedule->command('inspire')->hourly();
+        $schedule->command('command:grabCourses')->dailyAt('02:00');
         $schedule->command('command:grabEmployees')->dailyAt('02:05');
         $schedule->command('command:grabShifts')->dailyAt('02:10');
         $schedule->command('command:calculatePoints')->dailyAt('02:20');
