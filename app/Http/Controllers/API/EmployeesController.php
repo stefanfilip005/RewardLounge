@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Employee;
 use App\Http\Requests\EmployeeRequest;
+use App\Http\Resources\CourseResource;
 use App\Http\Resources\EmployeePublicResource;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\RankingResource;
 use App\Http\Resources\ShiftPublicResource;
 use App\Http\Resources\ShiftResource;
 use App\Http\Resources\StatisticShiftResource;
+use App\Models\Course;
 use App\Models\Ranking;
 use App\Models\Shift;
 use Carbon\Carbon;
@@ -230,12 +232,48 @@ class EmployeesController extends Controller
 		curl_close($ch);
 		return $response;
 	}
+    public function mycourses(Request $request){
+        $apicall = array();
+		
+		$apicall['req'] = 'GETMAKursanmeldungen';
+        $apicall['mnr'] = $request->user()->remoteId;
+		
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
+
+		$response = curl_exec($ch);
+
+		if (curl_errno($ch)) {
+			$error_msg = curl_error($ch);
+			curl_close($ch);
+			return json_encode([]);
+		}
+
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		return $response;
+	}
 
 
 
     public function latestShifts(Request $request){
         $shifts = Shift::where('employeeId',$request->user()->remoteId)->orderBy('start','desc')->paginate(25);
         return ShiftResource::collection($shifts);
+    }
+    public function courses(Request $request){
+        $today = Carbon::today();
+        $endOfNextMonth = Carbon::now()->addMonth()->endOfMonth();
+        $courses = Course::where('date', '>=', $today)
+        ->where('date', '<=', $endOfNextMonth)
+        ->orderBy('date', 'asc')
+        ->orderBy('von', 'asc')
+        ->paginate(25);
+        return CourseResource::collection($courses);
     }
 
 
