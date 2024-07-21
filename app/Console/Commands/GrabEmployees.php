@@ -69,12 +69,16 @@ class GrabEmployees extends Command
                         'firstname' => $row['Vorname'],
                         'lastname' => $row['Nachname'],
                         'email' => $row['E-Mail'],
-                        'phone' => $row['Mobil']
+                        'phone' => $row['Mobil'],
+                        'Status' => $row['Status'],
+                        'BezirksstellenNr' => $row['Bezirksstellen Nr'],
+                        'Mitarbeitertyp' => $row['Mitarbeitertyp'],
+                        'beurlaubtBis' => $row['beurlaubt bis']
                     );
                     $employeeIds[] = $employeeId;
                 }
             }
-            Employee::upsert($employees,['remoteId'],['firstname','lastname','email','phone']);
+            Employee::upsert($employees,['remoteId'],['firstname','lastname','email','phone','Status','BezirksstellenNr','Mitarbeitertyp','beurlaubtBis']);
         }
 
 /*
