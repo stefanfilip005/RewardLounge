@@ -14,10 +14,10 @@ class AddInfosToEmployeesTable extends Migration
     public function up()
     {
         Schema::table('employees', function (Blueprint $table) {
-            $table->string('Status')->default("")->after('employeeType');
-            $table->string('BezirksstellenNr')->default("")->after('employeeType');
-            $table->string('Mitarbeitertyp')->default("")->after('employeeType');
-            $table->string('beurlaubtBis')->default("")->after('employeeType');
+            $table->string('Status')->nullable()->after('employeeType');
+            $table->string('BezirksstellenNr')->nullable()->after('employeeType');
+            $table->string('Mitarbeitertyp')->nullable()->after('employeeType');
+            $table->string('beurlaubtBis')->nullable()->after('employeeType');
         });
     }
 
