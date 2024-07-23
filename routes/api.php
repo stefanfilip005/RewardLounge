@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     Route::get('faqs', [FAQController::class, 'index']);
     //Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']); // Redis cached
+    
 
     Route::get('/infoblaetter/{year}/{month}.pdf', [InfoblattController::class, 'getInfoblatt'])->where(['year' => '[0-9]{4}', 'month' => '[0-9]{2}']);// download pdf
     Route::get("shiftStatistics", [EmployeesController::class, 'shiftStatistics']);
@@ -100,6 +101,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
     Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
     Route::post('/order/{id}/mailConfirmationAgain', [OrderController::class, 'mailConfirmationAgain']);
+    Route::get('pointStatistic', [RewardsController::class, 'getPointStatistic']); 
 });
 
 /*

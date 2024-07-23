@@ -7,10 +7,64 @@ use App\Http\Controllers\Controller;
 use App\Models\Reward;
 use App\Http\Requests\RewardRequest;
 use App\Http\Resources\RewardResource;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Shift;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class RewardsController extends Controller
 {
+
+
+
+    public function getPointStatistic(){
+        $pointsPerYear = Shift::select(
+            DB::raw('YEAR(start) as year'),
+                DB::raw('SUM(COALESCE(overwrittenPoints, points)) as total_points')
+            )
+            ->whereYear('start', '>=', 2023)
+            ->groupBy(DB::raw('YEAR(start)'))
+            ->orderBy('year')
+            ->get();
+
+        $result = array();
+        foreach($pointsPerYear as $point){
+            $obj = new stdClass();
+            $obj->total_points = $point->total_points;
+            $result[$point->year] = $obj;
+        }
+
+
+
+        $currentYear = now()->year;
+        $yearlyPointsSummary = [];
+
+        for ($year = 2023; $year <= $currentYear; $year++) {
+            $yearlyPoints = Order::whereYear('created_at', $year)->where('state', '!=', 5)->sum('total_points');
+
+            $yearlyPointsWithArticle = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
+                                                ->whereYear('orders.created_at', $year)
+                                                ->where('orders.state', '!=', 5)
+                                                ->where('order_items.article_number', '!=', '')
+                                                ->sum('order_items.points');
+
+            $obj = new stdClass();
+            $obj->year = $year;
+
+            $obj->usedPoints = $yearlyPoints;
+            $obj->usedPointsWithArticle = $yearlyPointsWithArticle;
+            $yearlyPointsSummary[$year] = $obj;
+            if(isset($result[$year])){
+                $yearlyPointsSummary[$year]->collectedPoints = $result[$year]->total_points;
+            }
+        }
+
+        return response()->json($yearlyPointsSummary);
+    }
+
+
     /**
      * Display a listing of the resource.
      *
