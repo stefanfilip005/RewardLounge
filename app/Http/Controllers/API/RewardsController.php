@@ -45,16 +45,18 @@ class RewardsController extends Controller
             $yearlyPoints = Order::whereYear('created_at', $year)->where('state', '!=', 5)->sum('total_points');
 
             $yearlyPointsWithArticle = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
-                                                ->whereYear('orders.created_at', $year)
-                                                ->where('orders.state', '!=', 5)
-                                                ->where('order_items.article_number', '!=', '')
-                                                ->sum('order_items.points');
+                ->whereYear('orders.created_at', $year)
+                ->where('orders.state', '!=', 5)
+                ->where('order_items.article_number', '!=', '')
+                ->selectRaw('SUM(order_items.points * order_items.quantity) as total_points')
+                ->value('total_points');
+
 
             $obj = new stdClass();
             $obj->year = $year;
 
             $obj->usedPoints = $yearlyPoints;
-            $obj->usedPointsWithArticle = $yearlyPointsWithArticle;
+            $obj->usedPointsWithArticle = $yearlyPointsWithArticle ?? 0;
             $yearlyPointsSummary[$year] = $obj;
             if(isset($result[$year])){
                 $yearlyPointsSummary[$year]->collectedPoints = $result[$year]->total_points;
