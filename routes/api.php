@@ -101,7 +101,6 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
     Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
     Route::post('/order/{id}/mailConfirmationAgain', [OrderController::class, 'mailConfirmationAgain']);
-    Route::get('pointStatistic', [RewardsController::class, 'getPointStatistic']); 
 });
 
 /*
@@ -114,6 +113,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->gr
     Route::get("shifts", [EmployeesController::class, 'shifts']);
     Route::get("shiftsForEmployee", [EmployeesController::class, 'shiftsForEmployee']);
     Route::get("employeeFromId", [EmployeesController::class, 'employeeFromId']);
+    Route::get('pointStatistic', [RewardsController::class, 'getPointStatistic']); 
 });
 
 /*
