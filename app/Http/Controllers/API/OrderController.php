@@ -64,38 +64,49 @@ class OrderController extends Controller
 
         /* LEFT PART */
 
-        $pdf->SetXY(50,35);
+        $pdf->SetXY(45,35);
         $pdf->SetFont('Helvetica', 'B', 10);
-        $pdf->Cell(40,0,mb_convert_encoding('Bestellt von' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
+        $pdf->Cell(39,0,mb_convert_encoding('Bestellt von' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
         $pdf->SetFont('Helvetica', '', 10);
         $pdf->Cell(40,0,mb_convert_encoding($employee->firstname . ' ' . $employee->lastname, 'ISO-8859-1', 'UTF-8'),0,0,'L');
 
-        $pdf->SetXY(50,40);
+        $pdf->SetXY(45,40);
         $pdf->SetFont('Helvetica', 'B', 10);
-        $pdf->Cell(40,0,mb_convert_encoding('Telefonnr.' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
+        $pdf->Cell(39,0,mb_convert_encoding('Telefonnr.' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
         $pdf->SetFont('Helvetica', '', 10);
         $pdf->Cell(40,0,mb_convert_encoding($employee->phone, 'ISO-8859-1', 'UTF-8'),0,0,'L');
 
-        $pdf->SetXY(50,45);
+        $pdf->SetXY(45,45);
         $pdf->SetFont('Helvetica', 'B', 10);
-        $pdf->Cell(40,0,mb_convert_encoding('Email' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
+        $pdf->Cell(39,0,mb_convert_encoding('Email' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
         $pdf->SetFont('Helvetica', '', 10);
         $pdf->Cell(40,0,mb_convert_encoding($employee->email, 'ISO-8859-1', 'UTF-8'),0,0,'L');
 
-        $pdf->SetXY(50,55);
+        $pdf->SetXY(45,55);
         $pdf->SetFont('Helvetica', 'B', 10);
-        $pdf->Cell(40,0,mb_convert_encoding('Bestelldatum' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
+        $pdf->Cell(39,0,mb_convert_encoding('Bestelldatum' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
         $pdf->SetFont('Helvetica', '', 10);
         $viennaTime = Carbon::parse($order->created_at_datetime)->timezone('Europe/Vienna')->format('d.m.Y H:i:s');
         $pdf->Cell(40,0,mb_convert_encoding($viennaTime, 'ISO-8859-1', 'UTF-8'),0,0,'L');
 
-        $pdf->SetXY(50,60);
+        $pdf->SetXY(45,60);
         $pdf->SetFont('Helvetica', 'B', 10);
-        $pdf->Cell(40,0,mb_convert_encoding('Ausgegebene Pkt.' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
+        $pdf->Cell(39,0,mb_convert_encoding('Ausgegebene Pkt.' , 'ISO-8859-1', 'UTF-8'),0,0,'L');
         $pdf->SetFont('Helvetica', '', 10);
         $pdf->Cell(40,0,mb_convert_encoding(number_format($order->total_points,0,',','.'), 'ISO-8859-1', 'UTF-8'),0,0,'L');
 
 
+        
+
+        $pdf->SetXY(145,39);
+        $pdf->SetDrawColor(100,100,100);
+        $pdf->SetFont('Helvetica', 'B', 8);
+        $pdf->Cell(50,4,mb_convert_encoding('Ausgegeben am' , 'ISO-8859-1', 'UTF-8'),"T",0,'C');
+
+        $pdf->SetXY(145,58);
+        $pdf->SetDrawColor(100,100,100);
+        $pdf->SetFont('Helvetica', 'B', 8);
+        $pdf->Cell(50,4,mb_convert_encoding('Ausgegeben von' , 'ISO-8859-1', 'UTF-8'),"T",0,'C');
 
 
 
