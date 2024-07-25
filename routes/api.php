@@ -26,8 +26,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('login',function(Request $request){ return redirect('https://intern.rkhl.at/saml2/2209a842-3461-4241-968a-2d950ea35237/login'); })->name('login');;
-
+Route::get('login',function(Request $request){ return redirect('https://intern.rkhl.at/saml2/2209a842-3461-4241-968a-2d950ea35237/login'); })->name('login');
 
 Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     Route::prefix('self')->group(function () {
@@ -101,6 +100,8 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
     Route::post('/order/{id}/change-state', [OrderController::class, 'changeOrderState']);
     Route::post('/order/{id}/mailConfirmationAgain', [OrderController::class, 'mailConfirmationAgain']);
+    
+    Route::get('/order/{id}/pdf', [OrderController::class, 'generatePDF']);
 });
 
 /*
