@@ -138,6 +138,11 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::post('/employees/make-moderator/{id}', [EmployeesController::class, 'makeMod']);
     Route::post('/employees/make-df/{id}', [EmployeesController::class, 'makeDf']);
     Route::post('/employees/{id}/remove-roles', [EmployeesController::class, 'removeAllRoles']);
+    
+    Route::post('/employees/disable/{id}', [EmployeesController::class, 'disableEmployee']);
+    Route::post('/employees/enable/{id}', [EmployeesController::class, 'enableEmployee']);
+    Route::post('/employees/hide/{id}', [EmployeesController::class, 'hideEmployee']);
+    Route::post('/employees/unhide/{id}', [EmployeesController::class, 'unhideEmployee']);
 
     Route::post('rewards', [RewardsController::class, 'store']);
     Route::put('rewards/{reward}', [RewardsController::class, 'update']);

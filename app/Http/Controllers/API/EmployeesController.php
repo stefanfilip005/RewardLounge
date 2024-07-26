@@ -64,7 +64,7 @@ class EmployeesController extends Controller
 
     public function getEmployeesForRanking(Request $request)
     {
-        $employees = Employee::paginate(20000);
+        $employees = Employee::where('hidden',false)->paginate(20000);
         foreach($employees as $employee){
             $employee->self = $employee->remoteId == $request->user()->remoteId;
         }
@@ -628,7 +628,83 @@ class EmployeesController extends Controller
 
 
 
+    public function disableEmployee($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
 
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->active = false;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee flag updated successfully'
+        ]);
+    }
+    public function enableEmployee($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->active = true;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee flag updated successfully'
+        ]);
+    }
+
+    public function hideEmployee($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->hidden = true;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee hidden flag updated successfully'
+        ]);
+    }
+    public function unhideEmployee($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->hidden = false;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee hidden flag updated successfully'
+        ]);
+    }
 
 
 

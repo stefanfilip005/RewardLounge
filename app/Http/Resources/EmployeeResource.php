@@ -43,6 +43,9 @@ class EmployeeResource extends JsonResource
             'last_sms_sent' => $this->last_sms_sent,
             'sms_count' => $this->sms_count,
             'employeeType' => $this->employeeType,
+
+            'hidden' => $this->hidden,
+            'active' => $this->active,
         ];
     }
 }

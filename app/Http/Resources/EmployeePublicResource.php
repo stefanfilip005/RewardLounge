@@ -23,6 +23,8 @@ class EmployeePublicResource extends JsonResource
             'anonym' => !$this->showNameInRanking,
             'haupt' => $this->Mitarbeitertyp,
             'Status' => $this->Status,
+
+            'active' => $this->active,
             //'last_shift_date' => $this->last_shift_date ? Carbon::createFromFormat('Y-m-d H:i:s', $this->last_shift_date)->isoFormat('MMMM Y') : null,
         ];
 
