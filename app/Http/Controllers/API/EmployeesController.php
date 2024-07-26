@@ -711,6 +711,44 @@ class EmployeesController extends Controller
     }
 
 
+    public function setAuszeitTrue($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->auszeit = true;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee auszeit flag updated successfully'
+        ]);
+    }
+    public function setAuszeitFalse($id)
+    {
+        $employee = Employee::where('remoteId', $id)->first();
+
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        $employee->auszeit = false;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee auszeit flag updated successfully'
+        ]);
+    }
 
 
 }

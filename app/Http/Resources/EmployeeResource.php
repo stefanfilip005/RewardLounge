@@ -46,6 +46,7 @@ class EmployeeResource extends JsonResource
 
             'hidden' => $this->hidden,
             'active' => $this->active,
+            'auszeit' => $this->auszeit,
         ];
     }
 }

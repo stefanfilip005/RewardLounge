@@ -144,6 +144,9 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::post('/employees/hide/{id}', [EmployeesController::class, 'hideEmployee']);
     Route::post('/employees/unhide/{id}', [EmployeesController::class, 'unhideEmployee']);
 
+    Route::post('/employees/auszeitTrue/{id}', [EmployeesController::class, 'setAuszeitTrue']);
+    Route::post('/employees/auszeitFalse/{id}', [EmployeesController::class, 'setAuszeitFalse']);
+
     Route::post('rewards', [RewardsController::class, 'store']);
     Route::put('rewards/{reward}', [RewardsController::class, 'update']);
     Route::delete('rewards/{reward}', [RewardsController::class, 'destroy']);

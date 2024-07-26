@@ -25,6 +25,7 @@ class EmployeePublicResource extends JsonResource
             'Status' => $this->Status,
 
             'active' => $this->active,
+            'auszeit' => $this->auszeit,
             //'last_shift_date' => $this->last_shift_date ? Carbon::createFromFormat('Y-m-d H:i:s', $this->last_shift_date)->isoFormat('MMMM Y') : null,
         ];
 
