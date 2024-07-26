@@ -312,6 +312,10 @@ class EmployeesController extends Controller
                 unset($shifts[$key]);
                 continue;
             }
+            if($employeeMap[$shift->employeeId]->hidden){
+                unset($shifts[$key]);
+                continue;                
+            }
             
             $shift->employeeId = $employeeMap[$shift->employeeId]->id;
             $start = Carbon::parse($shift->start);
