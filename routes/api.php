@@ -110,8 +110,6 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->group(function () {
-    Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
-    Route::get("shifts", [EmployeesController::class, 'shifts']);
     Route::get("shiftsForEmployee", [EmployeesController::class, 'shiftsForEmployee']);
     Route::get("employeeFromId", [EmployeesController::class, 'employeeFromId']);
     Route::get('pointStatistic', [RewardsController::class, 'getPointStatistic']); 
@@ -123,6 +121,10 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->gr
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(function () {
+
+    Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
+    Route::get("shifts", [EmployeesController::class, 'shifts']);
+
     Route::get('allRewards', [RewardsController::class, 'indexAll']);
     Route::get('/login-logs', [LogController::class, 'loginLog']);
     Route::get('/access-logs', [LogController::class, 'accessLog']);
