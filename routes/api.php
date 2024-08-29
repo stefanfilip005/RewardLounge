@@ -95,6 +95,7 @@ Route::post('questions/{question}/answers/{answer}/respond', 'QuestionResponseCo
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(function () {
+    Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get('/employeesFromOrders', [OrderController::class, 'employeesFromOrders']);
     Route::get('/orders', [OrderController::class, 'getOrders']);
     Route::patch('/order/{orderId}/note', [OrderController::class, 'updateOrderNote']);
@@ -122,7 +123,6 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->gr
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(function () {
 
-    Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("shifts", [EmployeesController::class, 'shifts']);
 
     Route::get('allRewards', [RewardsController::class, 'indexAll']);
