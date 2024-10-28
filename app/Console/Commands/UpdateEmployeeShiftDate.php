@@ -80,7 +80,7 @@ class UpdateEmployeeShiftDate extends Command
         try {
             // Set time boundaries
             $twoYearsAgo = Carbon::now()->subYears(2)->startOfDay();
-            $sixMonthsAgo = Carbon::now()->subMonths(6)->startOfDay();
+            $twoMonthsAgo = Carbon::now()->subMonths(2)->startOfDay();
 
             // Fetch all shifts from the last 2 years
             $shifts = Shift::where('start', '>=', $twoYearsAgo)->get();
@@ -111,7 +111,7 @@ class UpdateEmployeeShiftDate extends Command
                 $employeeShiftTypes[$employeeId]['historic'][$shiftType]++;
 
                 // Specifically count recent shift types
-                if ($shift->start >= $sixMonthsAgo) {
+                if ($shift->start >= $twoMonthsAgo) {
                     if (!isset($employeeShiftTypes[$employeeId]['recent'][$shiftType])) {
                         $employeeShiftTypes[$employeeId]['recent'][$shiftType] = 0;
                     }
