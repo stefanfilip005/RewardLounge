@@ -209,9 +209,11 @@ class EmployeesController extends Controller
     
     public function futureShifts(Request $request){
         $apicall = array();
-		
-		$apicall['req'] = 'GETNextDienste';
+
+
+        $apicall['req'] = 'GET_NEXT_DIENSTE';
         $apicall['mnr'] = $request->user()->remoteId;
+        $apicall['anzahl'] = 10;
 		
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
