@@ -174,8 +174,10 @@ Route::get('startPointsCalculationForAllEmployees',function(Request $request){
     echo "Punkte werden im Hintergrund berechnet, das kann 1-2 Minuten dauern";
 });
 Route::get('startRankingCalculation',function(Request $request){
-    $year = 2023;
-    EmployeesController::calculateRankings($year);
-    $year = 2024;
+    //$year = 2023;
+    //EmployeesController::calculateRankings($year);
+    //$year = 2024;
+    //EmployeesController::calculateRankings($year);
+    $year = 2025;
     EmployeesController::calculateRankings($year);
 });

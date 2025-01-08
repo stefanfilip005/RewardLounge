@@ -44,9 +44,11 @@ class CalculateRanking extends Command
      */
     public function handle()
     {
-        $year = 2023;
-        EmployeesController::calculateRankings($year);
-        $year = 2024;
+        //$year = 2023;
+        //EmployeesController::calculateRankings($year);
+        //$year = 2024;
+        //EmployeesController::calculateRankings($year);
+        $year = 2025;
         EmployeesController::calculateRankings($year);
     }
 }
