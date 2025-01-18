@@ -85,29 +85,67 @@ class GrabFutureShifts extends Command
         //$plans['data'][4748] = 'KI-Team Hollabrunn';
 
         $allShifts = [];
-        foreach ($plans['data']['plan'] as $shiftId => $shiftData) {
-            foreach ($shiftData['ressources'] as $resource) {
-                if (!empty($resource['mnr'])) {
-                    $shift = [
-                        'shift_id' => $shiftId,
-                        'date' => $shiftData['date'] ?? null,
-                        'begin' => $shiftData['begin'] ?? null,
-                        'end' => $shiftData['end'] ?? null,
-                        'vehicle_type' => $shiftData['typ'] ?? null,
-                        'vehicle_type_id' => $shiftData['typid'] ?? null,
-                        'role' => $resource['typ'] ?? null,
-                        'role_id' => $resource['typid'] ?? null,
-                        'employee_id' => $resource['mnr'],
-                        'employee_name' => $resource['name_ma'] ?? null
-                    ];
-                    $allShifts[] = $shift;
+
+        // Iterate over each plan and make an API call
+        foreach ($plans['data'] as $planId => $planName) {
+            $apicall = [
+                'req' => 'GET_INCODE_PLAN',
+                'von' => date('Y-m-d'),
+                'bis' => date("Y-m-d", strtotime('+14 days')),
+                'OIDOrgEinheit' => $planId,
+            ];
+        
+            // Initialize cURL
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, config('custom.NRKAPISERVER'));
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'NRK-AUTH: ' . config('custom.NRKAPIKEY'),
+                'Content-Type: application/json',
+            ]);
+            $return = curl_exec($ch);
+            if (curl_errno($ch)) {
+                error_log('cURL Error: ' . curl_error($ch));
+                continue;
+            }
+            curl_close($ch);
+            if (strlen($return) < 5) {
+                continue;
+            }
+        
+            $shiftData = json_decode($return, true);
+            if (!isset($shiftData['data']['plan']) || !is_array($shiftData['data']['plan'])) {
+                continue;
+            }
+        
+            foreach ($shiftData['data']['plan'] as $shiftId => $shift) {
+                foreach ($shift['ressources'] as $resource) {
+                    if (!empty($resource['mnr'])) {
+                        $allShifts[] = [
+                            'shift_id' => $shiftId,
+                            'date' => $shift['date'] ?? null,
+                            'begin' => $shift['begin'] ?? null,
+                            'end' => $shift['end'] ?? null,
+                            'vehicle_type' => $shift['typ'] ?? null,
+                            'vehicle_type_id' => $shift['typid'] ?? null,
+                            'role' => $resource['typ'] ?? null,
+                            'role_id' => $resource['typid'] ?? null,
+                            'employee_id' => $resource['mnr'],
+                            'employee_name' => $resource['name_ma'] ?? null,
+                        ];
+                    }
                 }
             }
         }
+        
+        // Truncate and insert shifts in chunks
         FutureShift::truncate();
         $chunkSize = 100; 
         $chunks = array_chunk($allShifts, $chunkSize);
-
+        
         foreach ($chunks as $chunk) {
             FutureShift::insert($chunk);
         }
