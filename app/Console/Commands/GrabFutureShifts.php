@@ -44,35 +44,24 @@ class GrabFutureShifts extends Command
      */
     public function handle()
     {
-        $allShifts = array();
 
         $validKlasses = array();
-        //DF
-        $validKlasses[] = 'DF1';
 
-        //NEF
-        $validKlasses[] = 'FNB_NEF';
-
-        //RTW
-        $validKlasses[] = 'FRB';
-        $validKlasses[] = 'FRC';
+        $validKlasses[] = 'FRTWC';
         $validKlasses[] = 'SR1';
+        $validKlasses[] = 'SR2';
 
-        //KTW
-        $validKlasses[] = 'FKB';
-        $validKlasses[] = 'FKC';
-        $validKlasses[] = 'FKB-B';
+        $validKlasses[] = 'FKTW';
+        $validKlasses[] = 'FKTWB';
         $validKlasses[] = 'SK1';
-
-        //BKTW
-        $validKlasses[] = 'FBB';
-
-        
+        $validKlasses[] = 'SK2';
         
 
-        $apicall = array();
-        $apicall['req'] = 'RPS_PLAENE';
+        $validKlasses[] = 'FBKTW';
 
+
+        /*
+        $apicall['req'] = 'GET_INCODE_PLAENE';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -86,75 +75,41 @@ class GrabFutureShifts extends Command
         }
         $plans = json_decode($return, true);
         if(isset($plans['data'])){
-            foreach($plans['data'] as $plan){
-                $apicall['req'] = 'RPS';
-                $apicall['von'] = date('Y-m-d');
-                $apicall['bis'] = date("Y-m-d", strtotime('+14 days'));
-                $apicall['rpsid'] = $plan['id_rps'];
-            
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-                $return = curl_exec ($ch);
-                if(strlen($return) < 5){
-                    return;
-                }
-                $shiftData = json_decode($return, true);
-                if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
-                    foreach($shiftData['data']['plan'] as $row){
-                        $shift = [
-                            'Teil' => $row['Teil'] ?? null,
-                            'Verwendung' => $row['Verwendung'] ?? null,
-                            'Schicht' => $row['Schicht'] ?? null,
-                            'RemoteId' => $row['Id'] ?? null,
-                            'KlassId' => $row['KlassId'] ?? null,
-                            'IstVollst' => $row['IstVollst'] ?? null,
-                            'Datum' => $row['Datum'] ?? null,
-                            'Beginn' => $row['Beginn'] ?? null,
-                            'Ende' => $row['Ende'] ?? null,
-                            'PoolBeginn' => $row['PoolBeginn'] ?? null,
-                            'PoolEnde' => $row['PoolEnde'] ?? null,
-                            'Bezeichnung' => $row['Bezeichnung'] ?? null,
-                            'ObjektId' => $row['ObjektId'] ?? null,
-                            'ObjektBezeichnung1' => $row['ObjektBezeichnung1'] ?? null,
-                            'ObjektBezeichnung2' => $row['ObjektBezeichnung2'] ?? null,
-                            'ObjektInfo' => $row['ObjektInfo'] ?? null,
-                            'PlanInfo' => $row['PlanInfo'] ?? null,
-                            'IstForderer' => $row['IstForderer'] ?? null,
-                            'VaterId' => $row['VaterId'] ?? null,
-                            'IstOptional' => $row['IstOptional'] ?? null,
-                            'PoolId' => $row['PoolId'] ?? null,
-                            'PoolTeil' => $row['PoolTeil'] ?? null,
-                            'DienstartId' => $row['DienstartId'] ?? null,
-                            'DienstartBeschreibung' => $row['DienstartBeschreibung'] ?? null,
-                            'ChgUserAnzeigename' => $row['ChgUserAnzeigename'] ?? null,
-                            'ChgUserLoginname' => $row['ChgUserLoginname'] ?? null,
-                            'ChgDate' => $row['ChgDate'] ?? null,
-                            'AbteilungId' => $row['AbteilungId'] ?? null,
-                            'AbteilungBezeichnung' => $row['AbteilungBezeichnung'] ?? null,
-                            'AbteilungKZ' => $row['AbteilungKZ'] ?? null,
-                            'Info' => $row['Info'] ?? null,
-                            'TimeStamp' => $row['TimeStamp'] ?? null,
-                            'Processed' => $row['Processed'] ?? null,
-                            'MessageSent' => $row['MessageSent'] ?? null,
-                        ];
-                        $allShifts[] = $shift;
-                    }
-                }
-            }
-            
-            FutureShift::truncate();
-            $chunkSize = 100;
-            $chunks = array_chunk($allShifts, $chunkSize);
+        
+        }
+        */
+        $plans = array();
+        $plans['data'] = array();
+        $plans['data'][82] = 'Haugsdorf';
+        $plans['data'][3316] = 'Hollabrunn (RD)';
+        //$plans['data'][4748] = 'KI-Team Hollabrunn';
 
-            foreach ($chunks as $chunk) {
-                FutureShift::insert($chunk);
+        $allShifts = [];
+        foreach ($plans['data']['plan'] as $shiftId => $shiftData) {
+            foreach ($shiftData['ressources'] as $resource) {
+                if (!empty($resource['mnr'])) {
+                    $shift = [
+                        'shift_id' => $shiftId,
+                        'date' => $shiftData['date'] ?? null,
+                        'begin' => $shiftData['begin'] ?? null,
+                        'end' => $shiftData['end'] ?? null,
+                        'vehicle_type' => $shiftData['typ'] ?? null,
+                        'vehicle_type_id' => $shiftData['typid'] ?? null,
+                        'role' => $resource['typ'] ?? null,
+                        'role_id' => $resource['typid'] ?? null,
+                        'employee_id' => $resource['mnr'],
+                        'employee_name' => $resource['name_ma'] ?? null
+                    ];
+                    $allShifts[] = $shift;
+                }
             }
-            
+        }
+        FutureShift::truncate();
+        $chunkSize = 100; 
+        $chunks = array_chunk($allShifts, $chunkSize);
+
+        foreach ($chunks as $chunk) {
+            FutureShift::insert($chunk);
         }
     }
 }

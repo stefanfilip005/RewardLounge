@@ -9,13 +9,18 @@ class FutureShift extends Model
 {
     use HasFactory;
     protected $table = 'futureShifts';
+
     protected $fillable = [
-        'Teil', 'Verwendung', 'Schicht', 'RemoteId', 'KlassId', 'IstVollst',
-        'Datum', 'Beginn', 'Ende', 'PoolBeginn', 'PoolEnde', 'Bezeichnung',
-        'ObjektId', 'ObjektBezeichnung1', 'ObjektBezeichnung2', 'ObjektInfo',
-        'PlanInfo', 'IstForderer', 'VaterId', 'IstOptional', 'PoolId', 'PoolTeil',
-        'DienstartId', 'DienstartBeschreibung', 'ChgUserAnzeigename', 'ChgUserLoginname',
-        'ChgDate', 'AbteilungId', 'AbteilungBezeichnung', 'AbteilungKZ', 'Info', 'TimeStamp',
-        'Processed', 'MessageSent', 'created_at', 'updated_at'
+        'shift_id',
+        'date',
+        'begin',
+        'end',
+        'vehicle_type',
+        'vehicle_type_id',
+        'role',
+        'role_id',
+        'employee_id',
+        'employee_name'
     ];
+
 }
