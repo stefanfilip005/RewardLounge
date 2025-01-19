@@ -47,6 +47,12 @@ class GrabFutureShifts extends Command
 
         $validKlasses = array();
 
+        $validKlasses[] = 'DF';
+
+        $validKlasses[] = 'PNEF';
+        $validKlasses[] = 'FNEF';
+
+        $validKlasses[] = 'FRTW';
         $validKlasses[] = 'FRTWC';
         $validKlasses[] = 'SR1';
         $validKlasses[] = 'SR2';
@@ -56,8 +62,10 @@ class GrabFutureShifts extends Command
         $validKlasses[] = 'SK1';
         $validKlasses[] = 'SK2';
         
-
         $validKlasses[] = 'FBKTW';
+        
+        $validKlasses[] = 'F-BEL';
+        $validKlasses[] = 'RUFDF';
 
 
         /*
@@ -123,7 +131,7 @@ class GrabFutureShifts extends Command
         
             foreach ($shiftData['data']['plan'] as $shiftId => $shift) {
                 foreach ($shift['ressources'] as $resource) {
-                    if (!empty($resource['mnr'])) {
+                    if (!empty($resource['mnr']) && !empty($resource['typid']) && in_array($shift['typid'], $validKlasses)) {
                         $allShifts[] = [
                             'shift_id' => $shiftId,
                             'date' => $shift['date'] ?? null,
