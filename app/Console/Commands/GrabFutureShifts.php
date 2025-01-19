@@ -131,7 +131,7 @@ class GrabFutureShifts extends Command
         
             foreach ($shiftData['data']['plan'] as $shiftId => $shift) {
                 foreach ($shift['ressources'] as $resource) {
-                    if (!empty($resource['mnr']) && !empty($resource['typid']) && in_array($shift['typid'], $validKlasses)) {
+                    if (!empty($resource['mnr']) && !empty($resource['typid']) && in_array($resource['typid'], $validKlasses)) {
                         $allShifts[] = [
                             'shift_id' => $shiftId,
                             'date' => $shift['date'] ?? null,
