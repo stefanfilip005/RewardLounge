@@ -42,6 +42,44 @@ class GrabShifts extends Command
      */
     public function handle()
     {
+
+        /*
+        Array
+        (
+            [status] => OK
+            [data] => Array
+                (
+                    [82] => Haugsdorf
+                    [1211] => Henry Laden Hollabrunn
+                    [1238] => Betreutes Wohnen Hollabrunn I
+                    [1239] => Betreutes Wohnen Hollabrunn II
+                    [1258] => Team Österreich Tafel Hollabrunn
+                    [1311] => Hollabrunn (GSD)
+                    [1369] => Betreutes Reisen
+                    [1423] => Seniorentreff
+                    [1448] => Betreutes Wohnen
+                    [1497] => Lese - und Lern Patenschaft
+                    [1545] => Krisenintervention
+                    [1577] => SvE/Peer
+                    [1680] => Team Österreich Tafel
+                    [1734] => Henry Laden
+                    [1768] => Rufhilfe
+                    [1819] => Pflegebehelfeverleih
+                    [3000] => Hollabrunn (Verein)
+                    [3001] => Verwaltung
+                    [3002] => Haugsdorf (Verein)
+                    [3003] => Verwaltung
+                    [3140] => Besuchs - und Begleitdienst
+                    [3316] => Hollabrunn (RD)
+                    [4748] => KI-Team Hollabrunn
+                    [5522] => Hollabrunn (KHD)
+                    [5819] => Migration & Suchdienst
+                )
+
+        )
+        */
+
+
         $employees = array();
         $employeeIds = array();
         $allShifts = array();
@@ -49,7 +87,7 @@ class GrabShifts extends Command
         $demandTypeNames = array();
 
         $apicall = array();
-        $apicall['req'] = 'RPS_PLAENE';
+        $apicall['req'] = 'GET_INCODE_PLAENE';
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
@@ -64,11 +102,16 @@ class GrabShifts extends Command
         }
         $plans = json_decode($return, true);
         if(isset($plans['data'])){
-            foreach($plans['data'] as $plan){
-                $apicall['req'] = 'RPS';
-                $apicall['von'] = date('Y-m-d', strtotime('-14 days'));
+            foreach($plans['data'] as $key => $plan){
+                $startDate = date('Y-m-d', strtotime('-14 days'));
+                $minimumDate = '2025-01-01';
+                if ($startDate < $minimumDate) {
+                    $startDate = $minimumDate;
+                }
+                $apicall['req'] = 'GET_INCODE_PLAN';
+                $apicall['von'] = $startDate;
                 $apicall['bis'] = date("Y-m-d", strtotime('-1 days'));
-                $apicall['rpsid'] = $plan['id_rps'];
+                $apicall['OIDOrgEinheit'] = $key;
             
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
@@ -82,8 +125,30 @@ class GrabShifts extends Command
                     return;
                 }
                 $shiftData = json_decode($return, true);
+
+                print_r($shiftData);
                 if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
-                    foreach($shiftData['data']['plan'] as $row){
+                    foreach($shiftData['data']['plan'] as $entry){
+
+                        foreach($entry['ressources'] as $ressource){
+                            $employeeId = $ressource['mnr'];
+                            $shift = array(
+                                'employeeId' => $employeeId,
+                                'start' => Carbon::parse($row['begin'], 'Europe/Vienna'),
+                                'end' => Carbon::parse($row['end'], 'Europe/Vienna'),
+
+                                'demandType' => $row['KlassId'],
+                                'shiftType' => $row['DienstartBeschreibung'],
+                                'location' => $plan['id_rps']
+                            );
+                            $allShifts[] = $shift;
+
+                        }
+
+
+
+
+
                             if(strlen($row['ObjektId']) > 1){
                                 $employeeId = ltrim(substr($row['ObjektId'], 1), '0');
 
@@ -96,20 +161,16 @@ class GrabShifts extends Command
                                     $demandTypes[] = array('name' => $row['KlassId'],'shiftType' => $row['DienstartBeschreibung']);
                                     $demandTypeNames[] = $row['KlassId'] . '_X_' . $row['DienstartBeschreibung'];
                                 }
-                                
-                                $shift = array(
-                                    'employeeId' => $employeeId,
-                                    'start' => Carbon::parse($row['Beginn'], 'Europe/Vienna'),
-                                    'end' => Carbon::parse($row['Ende'], 'Europe/Vienna'),
-                                    'demandType' => $row['KlassId'],
-                                    'shiftType' => $row['DienstartBeschreibung'],
-                                    'location' => $plan['id_rps']
-                                );
-                                $allShifts[] = $shift;
                             }
+
+
+
+
                     }
                 }
+
             }
+            /*
             $lowestDate = Carbon::now()->addYears(100);
             $highestDate = Carbon::now()->subYears(100);
             foreach($allShifts as $line){
@@ -154,7 +215,7 @@ class GrabShifts extends Command
                         break; // Break inner loop if match is found
                     }
                 }
-            }
+            }*/
 
         }
     }
