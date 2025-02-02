@@ -50,42 +50,40 @@ class GrabFutureShifts extends Command
         $validKlasses[] = 'DF';
 
         $validKlasses[] = 'PNEF';
+        $validKlasses[] = 'PLNEF';
         $validKlasses[] = 'FNEF';
+        $validKlasses[] = 'NFS';
+        
+        $validKlasses[] = 'PNAW';
+        $validKlasses[] = 'FNAW';
+        $validKlasses[] = 'FSNAW';
+        $validKlasses[] = 'LSRTW';
 
         $validKlasses[] = 'FRTW';
         $validKlasses[] = 'FRTWC';
         $validKlasses[] = 'SR1';
         $validKlasses[] = 'SR2';
+        
+        $validKlasses[] = 'LRTWC';
+        $validKlasses[] = 'PRS';
+        $validKlasses[] = 'PNFS';
 
         $validKlasses[] = 'FKTW';
+        $validKlasses[] = 'PKTW';
         $validKlasses[] = 'FKTWB';
         $validKlasses[] = 'SK1';
         $validKlasses[] = 'SK2';
+        $validKlasses[] = 'BKTWB';
+        
         
         $validKlasses[] = 'FBKTW';
         
         $validKlasses[] = 'F-BEL';
+        $validKlasses[] = 'BEL';
         $validKlasses[] = 'RUFDF';
+        $validKlasses[] = 'PDF';
 
 
-        /*
-        $apicall['req'] = 'GET_INCODE_PLAENE';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-        $return = curl_exec ($ch);
-        if(strlen($return) < 5){
-            return;
-        }
-        $plans = json_decode($return, true);
-        if(isset($plans['data'])){
-        
-        }
-        */
         $plans = array();
         $plans['data'] = array();
         $plans['data'][82] = 'Haugsdorf';

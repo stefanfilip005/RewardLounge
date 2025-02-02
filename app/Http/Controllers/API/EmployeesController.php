@@ -103,10 +103,10 @@ class EmployeesController extends Controller
         //$userID = 5518;
         //$userID = 38128;//228242;
         $rankings = collect();
-        $locations = [null, 38, 39]; // Array of locations including null
+        $locations = [null, 38, 39, 82, 3316]; // Array of locations including null
 
-        //foreach ([2023, 2024, 2025] as $year) {
-        foreach ([2025] as $year) {
+        foreach ([2023, 2024, 2025] as $year) {
+        //foreach ([2025] as $year) {
             foreach ($locations as $location) {
                 // Modify the query to consider location
                 $ranking = Ranking::where('year', $year)
@@ -230,11 +230,67 @@ class EmployeesController extends Controller
 			curl_close($ch);
 			return json_encode([]);
 		}
-
-		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
-		return $response;
-	}
+        $responseData = json_decode($response, true);
+        if (!isset($responseData['data'])) {
+            return response()->json([]);
+        }
+
+        $processedShifts = [];
+    
+        $locationMapping = [
+            3316 => 'Hollabrunn',
+            82 => 'Haugsdorf',
+            // Füge weitere Mapping-Einträge bei Bedarf hinzu
+        ];
+    
+        foreach ($responseData['data'] as $shift) {
+            // Datumsformatierung
+            $date = Carbon::createFromFormat('Y-m-d', $shift['date'])->format('d.m.Y');
+
+            // Zeitformatierung
+            $begin = Carbon::createFromFormat('Y-m-d H:i:s', $shift['begin'])->format('H:i');
+            $end = Carbon::createFromFormat('Y-m-d H:i:s', $shift['end'])->format('H:i');
+            
+            // Ortsbestimmung
+            $location = $locationMapping[$shift['OIDOrgUnit']] ?? 'Unbekannt';
+    
+            // Fahrzeugsuche
+            $vehicle = '';
+            foreach ($shift['ressources'] as $resource) {
+                if ($resource['typid'] === 'KFZ') {
+                    $vehicle = $resource['ressource'] ?? '';
+                    break;
+                }
+            }
+    
+            // Kollegen sammeln
+            $colleagues = [];
+            foreach ($shift['ressources'] as $resource) {
+                if ($resource['typid'] === 'KFZ' || $resource['mnr'] == $request->user()->remoteId) {
+                    continue;
+                }
+    
+                if (!empty($resource['name_ma'])) {
+                    $nameParts = explode('(', $resource['name_ma']);
+                    $cleanName = trim($nameParts[0]);
+                    $colleagues[] = $cleanName . ' (' . $resource['typid'] . ')';
+                }
+            }
+    
+            $processedShifts[] = [
+                'Datum' => $date,
+                'Beginn' => $begin,
+                'Ende' => $end,
+                'Ort' => $location,
+                'Typ id' => $shift['typid'],
+                'Fahrzeug' => $vehicle,
+                'Kollegen' => implode(', ', $colleagues)
+            ];
+        }
+    
+        return response()->json($processedShifts);
+    }
     public function mycourses(Request $request){
         $apicall = array();
 		
@@ -284,7 +340,7 @@ class EmployeesController extends Controller
         $shifts = null;
         if(isset($request->year)) {
             $year = $request->year;
-            $shifts = Shift::whereIn('location',[38,39])
+            $shifts = Shift::whereIn('location',[38,39,82,3316])
                 ->whereYear('start', $year)
                 ->where('demandType', 'NOT LIKE', 'KFZ%')
                 ->get();
@@ -296,7 +352,7 @@ class EmployeesController extends Controller
         $shifts = null;
         if(isset($request->year)) {
             $year = $request->year;
-            $shifts = Shift::whereIn('location',[38,39])
+            $shifts = Shift::whereIn('location',[38,39,82,3316])
                 ->whereYear('start', $year)
                 ->where('demandType', 'NOT LIKE', 'KFZ%')
                 ->where('points','>',0)
@@ -310,8 +366,11 @@ class EmployeesController extends Controller
         }
 
         foreach ($shifts as $key => $shift) {
-            $employeeType = $employeeMap[$shift->employeeId]->employeeType;
-            if (substr($employeeType, 0, 3) !== 'EA-') {
+            //$employeeType = $employeeMap[$shift->employeeId]->employeeType;
+            //if (substr($employeeType, 0, 3) !== 'EA-' || strcmp($employeeType, 'EA') !== 0) {
+
+            $employeeStatus = $employeeMap[$shift->employeeId]->Status;
+            if ($employeeStatus != 'Ehrenamtlich') {
                 unset($shifts[$key]);
                 continue;
             }
@@ -340,7 +399,7 @@ class EmployeesController extends Controller
         $shifts = null;
         if(isset($request->year)) {
             $year = $request->year;
-            $shifts = Shift::whereIn('location',[38,39])
+            $shifts = Shift::whereIn('location',[38,39,82,3316])
                 ->whereYear('start', $year)
                 ->where('demandType', 'NOT LIKE', 'KFZ%')
                 ->get();
@@ -377,7 +436,7 @@ class EmployeesController extends Controller
                 $employees[$shift->employeeId]['points'] += $shift->points;
             }
 
-            if($shift->location == 38){
+            if($shift->location == 38 || $shift->location == 3316){
                 if(!isset($employeesHollabrunn[$shift->employeeId])){
                     $employeesHollabrunn[$shift->employeeId] = [
                         'remoteId' => $shift->employeeId,
@@ -395,7 +454,7 @@ class EmployeesController extends Controller
                 }
             }
 
-            if($shift->location == 39){
+            if($shift->location == 39 || $shift->location == 82){
                 if(!isset($employeesHaugsdorf[$shift->employeeId])){
                     $employeesHaugsdorf[$shift->employeeId] = [
                         'remoteId' => $shift->employeeId,
@@ -500,7 +559,7 @@ class EmployeesController extends Controller
                 }
                 $platzierungCounter++;
             }
-            Ranking::where('year',$year)->where('location', 38)->delete();
+            Ranking::where('year',$year)->whereIn('location', [38,3316])->delete();
             Ranking::upsert($employeesHollabrunn,['year','remoteId','location'],['place','points','pointsForNext']);
         }
 
@@ -535,7 +594,7 @@ class EmployeesController extends Controller
                 }
                 $platzierungCounter++;
             }
-            Ranking::where('year',$year)->where('location', 39)->delete();
+            Ranking::where('year',$year)->whereIn('location', [39,82])->delete();
             Ranking::upsert($employeesHaugsdorf,['year','remoteId','location'],['place','points','pointsForNext']);
         }
 

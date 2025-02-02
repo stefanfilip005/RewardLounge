@@ -48,114 +48,195 @@ class GrabShifts extends Command
         $demandTypes = array();
         $demandTypeNames = array();
 
-        $apicall = array();
-        $apicall['req'] = 'RPS_PLAENE';
+        $plans = array();
+        $plans['data'] = array();
+        $plans['data'][82] = 'Haugsdorf';
+        $plans['data'][3316] = 'Hollabrunn (RD)';
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-        $return = curl_exec ($ch);
-        if(strlen($return) < 5){
-            return;
-        }
-        $plans = json_decode($return, true);
-        if(isset($plans['data'])){
-            foreach($plans['data'] as $plan){
-                $apicall['req'] = 'RPS';
-                $apicall['von'] = date('Y-m-d', strtotime('-14 days'));
-                $apicall['bis'] = date("Y-m-d", strtotime('-1 days'));
-                $apicall['rpsid'] = $plan['id_rps'];
-            
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL,config('custom.NRKAPISERVER'));
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
-                $return = curl_exec ($ch);
-                if(strlen($return) < 5){
-                    return;
+
+        $employeeDutyMap = array();
+        foreach ($plans['data'] as $planId => $planName) {
+
+            $apicall = [
+                'req' => 'GET_INCODE_DUTYS',
+                'von' => date('Y-m-d', strtotime('-14 days')),
+                'bis' => date("Y-m-d", strtotime('-1 days')),
+                'OIDOrgEinheit' => $planId,
+            ];
+        
+            // Initialize cURL
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, config('custom.NRKAPISERVER'));
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'NRK-AUTH: ' . config('custom.NRKAPIKEY'),
+                'Content-Type: application/json',
+            ]);
+            $return = curl_exec($ch);
+            if (curl_errno($ch)) {
+                error_log('cURL Error: ' . curl_error($ch));
+                continue;
+            }
+            curl_close($ch);
+            if (strlen($return) < 5) {
+                continue;
+            }
+        
+            $dutys = json_decode($return, true);
+            if (!isset($dutys['data']) || !is_array($dutys['data'])) {
+                continue;
+            }
+
+            foreach($dutys['data'] as $duty){
+                /*
+                [0] => Array
+                (
+                    [date] => 2025-01-05
+                    [begin] => 2025-01-05 06:00:00
+                    [end] => 2025-01-06 06:00:00
+                    [mnr] => 14273
+                    [typ] => DienstfÃ¼hrer
+                    [typid] => DF
+                    [art] => Doppelverwendung
+                    [artid] => DV
+                )*/
+                if(isset($duty['mnr']) && $duty['mnr'] != null && strlen($duty['mnr']) > 1){
+                    if(!isset($employeeDutyMap[$duty['mnr']])){
+                        $employeeDutyMap[$duty['mnr']] = array();
+                    }
+                    $employeeDutyMap[$duty['mnr']][] = $duty;
                 }
-                $shiftData = json_decode($return, true);
-                if(isset($shiftData['data']) && isset($shiftData['data']['plan'])){
-                    foreach($shiftData['data']['plan'] as $row){
-                            if(strlen($row['ObjektId']) > 1){
-                                $employeeId = ltrim(substr($row['ObjektId'], 1), '0');
+            }
 
-                                if(!in_array($employeeId,$employeeIds)){
-                                    $employees[] = array('remoteId' => $employeeId);
-                                    $employeeIds[] = $employeeId;
-                                }
+            $apicall = [
+                'req' => 'GET_INCODE_PLAN',
+                'von' => date('Y-m-d', strtotime('-14 days')),
+                'bis' => date("Y-m-d", strtotime('-1 days')),
+                'OIDOrgEinheit' => $planId,
+            ];
+        
+            // Initialize cURL
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, config('custom.NRKAPISERVER'));
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'NRK-AUTH: ' . config('custom.NRKAPIKEY'),
+                'Content-Type: application/json',
+            ]);
+            $return = curl_exec($ch);
+            if (curl_errno($ch)) {
+                error_log('cURL Error: ' . curl_error($ch));
+                continue;
+            }
+            curl_close($ch);
+            if (strlen($return) < 5) {
+                continue;
+            }
+        
+            $shiftData = json_decode($return, true);
+            if (!isset($shiftData['data']['plan']) || !is_array($shiftData['data']['plan'])) {
+                continue;
+            }
+        
+            foreach ($shiftData['data']['plan'] as $shiftId => $shift) {
+                foreach ($shift['ressources'] as $resource) {
+                    if (!empty($resource['mnr']) && !empty($resource['typid'])) {
+                        $employeeId = $resource['mnr'];
+                        if(!in_array($employeeId,$employeeIds)){
+                            $employees[] = array('remoteId' => $employeeId); //used for upsert later
+                            $employeeIds[] = $employeeId;
+                        }
 
-                                if(!in_array($row['KlassId'] . '_X_' . $row['DienstartBeschreibung'],$demandTypeNames)){
-                                    $demandTypes[] = array('name' => $row['KlassId'],'shiftType' => $row['DienstartBeschreibung']);
-                                    $demandTypeNames[] = $row['KlassId'] . '_X_' . $row['DienstartBeschreibung'];
+                        $demandType = "NONE";
+                        if (isset($employeeDutyMap[$employeeId])) {
+                            foreach ($employeeDutyMap[$employeeId] as $duty) {
+                                $dutyDate = Carbon::parse($duty['begin'])->startOfDay();
+                                $shiftStartDate = Carbon::parse($resource['begin'])->startOfDay();
+                                $shiftStartPrevDay = $shiftStartDate->copy()->subDay();
+
+                                if (Carbon::parse($duty['begin'])->eq(Carbon::parse($resource['begin']))) {
+                                    // Exact match with shift begin
+                                    $demandType = $duty['artid'];
+                                    break;
+                                } elseif ($dutyDate->eq($shiftStartDate)) {
+                                    // Match on the same day
+                                    $demandType = $duty['artid'];
+                                } elseif ($dutyDate->eq($shiftStartPrevDay)) {
+                                    // Match one day before
+                                    $demandType = $duty['artid'];
                                 }
-                                
-                                $shift = array(
-                                    'employeeId' => $employeeId,
-                                    'start' => Carbon::parse($row['Beginn'], 'Europe/Vienna'),
-                                    'end' => Carbon::parse($row['Ende'], 'Europe/Vienna'),
-                                    'demandType' => $row['KlassId'],
-                                    'shiftType' => $row['DienstartBeschreibung'],
-                                    'location' => $plan['id_rps']
-                                );
-                                $allShifts[] = $shift;
                             }
+                        }
+
+                        if (!in_array($resource['typid'] . '_X_' . $demandType, $demandTypeNames)) {
+                            $demandTypes[] = array('name' => $resource['typid'], 'shiftType' => $demandType); // Used for upsert
+                            $demandTypeNames[] = $resource['typid'] . '_X_' . $demandType; // Custom key
+                        }
+
+                        $shift = array(
+                            'employeeId' => $employeeId,
+                            'start' => Carbon::parse($resource['begin'], 'Europe/Vienna'),
+                            'end' => Carbon::parse($resource['end'], 'Europe/Vienna'),
+                            'demandType' => $resource['typid'] ?? '',
+                            'shiftType' => $demandType,
+                            'location' => $planId
+                        );
+                        $allShifts[] = $shift;
                     }
                 }
             }
-            $lowestDate = Carbon::now()->addYears(100);
-            $highestDate = Carbon::now()->subYears(100);
-            foreach($allShifts as $line){
-                if($line['start']->lessThan($lowestDate)){
-                    $lowestDate = $line['start']->copy();
-                }
-                if($line['end']->greaterThan($highestDate)){
-                    $highestDate = $line['end']->copy();
-                }
-            }
-            Demandtype::upsert($demandTypes,['name','shiftType']);
-            Employee::upsert($employees,['remoteId']);
-
-
-            // Step 1: Retrieve and store shifts with overwritten points
-            $shiftsWithOverwrittenPoints = Shift::where('start', '>=', $lowestDate)
-                ->where('end', '<=', $highestDate)
-                ->whereNotNull('overwrittenPoints')
-                ->get(['employeeId', 'start', 'end', 'demandType', 'shiftType', 'location', 'overwrittenPoints']);
-
-            $temporaryStorage = $shiftsWithOverwrittenPoints->toArray();
-
-
-            // Step 2: Delete and insert shifts
-            Shift::where('start','>=',$lowestDate)->where('end','<=',$highestDate)->delete();
-            Shift::insert($allShifts);
-
-            // Step 3: Match and update new shifts
-            $newShifts = Shift::where('start', '>=', $lowestDate)->where('end', '<=', $highestDate)->get();
-
-            foreach ($newShifts as $newShift) {
-                foreach ($temporaryStorage as $oldShift) {
-                    if ($newShift->employeeId == $oldShift['employeeId'] && 
-                        $newShift->start == $oldShift['start'] && 
-                        $newShift->end == $oldShift['end'] && 
-                        $newShift->demandType == $oldShift['demandType'] && 
-                        $newShift->shiftType == $oldShift['shiftType'] && 
-                        $newShift->location == $oldShift['location']) {
-                        // Match found - update overwrittenPoints
-                        $newShift->overwrittenPoints = $oldShift['overwrittenPoints'];
-                        $newShift->save();
-                        break; // Break inner loop if match is found
-                    }
-                }
-            }
-
         }
+        $lowestDate = Carbon::now()->addYears(100);
+        $highestDate = Carbon::now()->subYears(100);
+        foreach($allShifts as $line){
+            if($line['start']->lessThan($lowestDate)){
+                $lowestDate = $line['start']->copy();
+            }
+            if($line['end']->greaterThan($highestDate)){
+                $highestDate = $line['end']->copy();
+            }
+        }
+        Demandtype::upsert($demandTypes,['name','shiftType']);
+        Employee::upsert($employees,['remoteId']);
+
+
+        // Step 1: Retrieve and store shifts with overwritten points
+        $shiftsWithOverwrittenPoints = Shift::where('start', '>=', $lowestDate)
+            ->where('end', '<=', $highestDate)
+            ->whereNotNull('overwrittenPoints')
+            ->get(['employeeId', 'start', 'end', 'demandType', 'shiftType', 'location', 'overwrittenPoints']);
+
+        $temporaryStorage = $shiftsWithOverwrittenPoints->toArray();
+
+
+        // Step 2: Delete and insert shifts
+        Shift::where('start','>=',$lowestDate)->where('end','<=',$highestDate)->delete();
+        Shift::insert($allShifts);
+
+        // Step 3: Match and update new shifts
+        $newShifts = Shift::where('start', '>=', $lowestDate)->where('end', '<=', $highestDate)->get();
+
+        foreach ($newShifts as $newShift) {
+            foreach ($temporaryStorage as $oldShift) {
+                if ($newShift->employeeId == $oldShift['employeeId'] && 
+                    $newShift->start == $oldShift['start'] && 
+                    $newShift->end == $oldShift['end'] && 
+                    $newShift->demandType == $oldShift['demandType'] && 
+                    $newShift->shiftType == $oldShift['shiftType'] && 
+                    $newShift->location == $oldShift['location']) {
+                    // Match found - update overwrittenPoints
+                    $newShift->overwrittenPoints = $oldShift['overwrittenPoints'];
+                    $newShift->save();
+                    break; // Break inner loop if match is found
+                }
+            }
+        }
+
     }
 }
