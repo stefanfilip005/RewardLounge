@@ -7,6 +7,7 @@ use App\Http\Controllers\API\RewardsController;
 use App\Http\Controllers\API\ShiftsController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\FAQController;
+use App\Http\Controllers\API\GiftedPointsController;
 use App\Http\Controllers\API\GreetingController;
 use App\Http\Controllers\API\OrderController;
 use App\Jobs\ProcessPoints;
@@ -32,6 +33,7 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     Route::prefix('self')->group(function () {
         Route::get("user-profile", [EmployeesController::class, 'userProfile']);
         Route::get("ranking", [EmployeesController::class, 'selfRanking']);
+        Route::get("gifted-points", [GiftedPointsController::class, 'indexForUser']);
 
         Route::get('employees/config', [EmployeesController::class, 'myConfig']);
         Route::post('employees/config', [EmployeesController::class, 'saveConfig']);
@@ -152,6 +154,12 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     Route::post('rewards', [RewardsController::class, 'store']);
     Route::put('rewards/{reward}', [RewardsController::class, 'update']);
     Route::delete('rewards/{reward}', [RewardsController::class, 'destroy']);
+
+    
+    Route::post('gifted-points', [GiftedPointsController::class, 'index']);
+    Route::post('update-gifted-points', [GiftedPointsController::class, 'update']);
+    
+    //Route::apiResource('gifted-points', GiftedPointsController::class)->only(['index', 'update', 'destroy']);
 });
 
 

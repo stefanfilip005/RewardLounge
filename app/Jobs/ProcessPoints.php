@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Demandtype;
 use App\Models\Employee;
+use App\Models\GiftedPoint;
 use App\Models\Multiplication;
 use App\Models\Order;
 use App\Models\Shift;
@@ -93,6 +94,9 @@ class ProcessPoints implements ShouldQueue
         foreach($orders as $order){
             $points = $points - $order->total_points;
         }
+
+        $giftedPoints = GiftedPoint::where('receiver_remote_id', $this->employeeId)->sum('points');
+        $points += $giftedPoints; // Add the gifted points
 
         Employee::where('remoteId',$this->employeeId)->update(['points' => $points, 'shifts' => $shiftCounter, 'lastPointCalculation' => Carbon::now()]);
         Shift::upsert($shiftUpserts,['id'],['points', 'lastPointCalculation']);
