@@ -10,6 +10,7 @@ use App\Http\Controllers\API\FAQController;
 use App\Http\Controllers\API\GiftedPointsController;
 use App\Http\Controllers\API\GreetingController;
 use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\BallSlotsController;
 use App\Jobs\ProcessPoints;
 use App\Models\Employee;
 use Illuminate\Http\Request;
@@ -80,6 +81,9 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     // If we would like this, then we need to make a shiftResource without start,end,lastPointCalculation
     Route::get("employeesForRanking", [EmployeesController::class, 'getEmployeesForRanking']);
     Route::get("shiftsForRanking", [EmployeesController::class, 'getShiftsForRanking']);
+
+    Route::get('ball-slots', [BallSlotsController::class, 'index']);
+    Route::post('ball-slots/{slot}/self-register', [BallSlotsController::class, 'selfRegister']);
 });
 
 
