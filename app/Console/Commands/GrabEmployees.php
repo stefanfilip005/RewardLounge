@@ -71,14 +71,21 @@ class GrabEmployees extends Command
                         'email' => $row['E-Mail'],
                         'phone' => $row['Mobil'],
                         'Status' => $row['Status'],
-                        'BezirksstellenNr' => $row['Bezirksstellen Nr'],
-                        'Mitarbeitertyp' => $row['Mitarbeitertyp'],
-                        'beurlaubtBis' => $row['beurlaubt bis']
+                        'BezirksstellenNr' => $row['Bezirksstellen Nr'] ?? null,
+                        'Mitarbeitertyp'   => $row['Mitarbeitertyp'] ?? null,
+                        'beurlaubtBis'     => $row['beurlaubt bis'] ?? null,
                     );
                     $employeeIds[] = $employeeId;
                 }
             }
             Employee::upsert($employees,['remoteId'],['firstname','lastname','email','phone','Status','BezirksstellenNr','Mitarbeitertyp','beurlaubtBis']);
+
+            if (!empty($employeeIds)) {
+                Employee::whereNotIn('remoteId', $employeeIds)
+                    ->where('active', 1)      // nur aktuell aktive
+                    ->update(['active' => 0]); // auf inaktiv setzen
+            }
+
         }
 
 /*

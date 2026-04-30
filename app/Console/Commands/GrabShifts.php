@@ -11,6 +11,81 @@ use Illuminate\Support\Facades\Config;
 
 class GrabShifts extends Command
 {
+
+private const UNKNOWN_SHIFT_TYPE = 'NONE';
+
+private function normalizeShiftTypeFromDuty(array $duty): string
+{
+    $raw = $duty['artid'] ?? null;
+    $raw = is_string($raw) ? trim($raw) : $raw;
+
+    // Wenn artid fehlt/leer/?, versuch über "art" (Text) zu raten
+    if ($raw === null || $raw === '' || $raw === '?') {
+        return self::UNKNOWN_SHIFT_TYPE; // niemals null!
+    }
+
+    $raw = strtoupper((string)$raw);
+
+    // Alte / gemischte Codes normalisieren (z.B. "EA-RKT", "EA-RKT_Rufbereitschaft", "HA-GSD" ...)
+    // Wir nehmen den "Basis"-Teil vor "-" oder "_" und mappen HA -> HB
+    $base = $raw;
+    $dashPos = strpos($base, '-');
+    if ($dashPos !== false) {
+        $base = substr($base, 0, $dashPos);
+    }
+    $underPos = strpos($base, '_');
+    if ($underPos !== false) {
+        $base = substr($base, 0, $underPos);
+    }
+
+    if ($base === 'HA') {
+        return 'HB';
+    }
+
+    // Wenn’s eh schon ein sauberer Code ist: zurück damit.
+    // Alles andere lieber als "NONE" speichern (oder du erlaubst extra Codes).
+    $allowed = ['HB', 'EA', 'ZD', 'DV', 'FSJ', 'EX', 'NONE'];
+    if (in_array($base, $allowed, true)) {
+        return $base;
+    }
+
+    // Falls du HEK o.ä. wirklich als eigene Kategorie willst: hier ergänzen.
+    return self::UNKNOWN_SHIFT_TYPE;
+}
+
+private function resolveShiftType($employeeId, Carbon $shiftBegin, Carbon $shiftEnd, array $employeeDutyMap): string
+{
+    if (!isset($employeeDutyMap[$employeeId])) {
+        return self::UNKNOWN_SHIFT_TYPE;
+    }
+
+    $bestType = self::UNKNOWN_SHIFT_TYPE;
+    $bestOverlapSeconds = 0;
+
+    foreach ($employeeDutyMap[$employeeId] as $duty) {
+        if (empty($duty['begin']) || empty($duty['end'])) {
+            continue;
+        }
+
+        $dBegin = Carbon::parse($duty['begin'], 'Europe/Vienna');
+        $dEnd   = Carbon::parse($duty['end'], 'Europe/Vienna');
+
+        // Overlap berechnen
+        $start = $dBegin->greaterThan($shiftBegin) ? $dBegin : $shiftBegin;
+        $end   = $dEnd->lessThan($shiftEnd) ? $dEnd : $shiftEnd;
+
+        $overlap = $end->greaterThan($start) ? $end->diffInSeconds($start) : 0;
+
+        if ($overlap > $bestOverlapSeconds) {
+            $bestOverlapSeconds = $overlap;
+            $bestType = $this->normalizeShiftTypeFromDuty($duty);
+        }
+    }
+
+    return $bestType ?: self::UNKNOWN_SHIFT_TYPE; // doppelt abgesichert
+}
+
+
     /**
      * The name and signature of the console command.
      *
@@ -90,6 +165,20 @@ class GrabShifts extends Command
                 continue;
             }
 
+            if (!empty($dutys['data'])) {
+                foreach ($dutys['data'] as &$d) { // Referenz wichtig, damit wir $dutys mutieren
+                    if (
+                        isset($d['mnr']) && (int)$d['mnr'] === 393305 // nur dieser Mitarbeiter
+                        && (!isset($d['artid']) || $d['artid'] === '' || $d['artid'] === null || $d['artid'] === '?')
+                    ) {
+                        $d['artid'] = 'HB';
+                        if (empty($d['art'])) { $d['art'] = 'Hauptberuflich'; }
+                    }
+                }
+                unset($d); // Referenz sauber lösen
+            }
+
+
             foreach($dutys['data'] as $duty){
                 /*
                 [0] => Array
@@ -153,28 +242,15 @@ class GrabShifts extends Command
                             $employeeIds[] = $employeeId;
                         }
 
-                        $demandType = "NONE";
-                        if (isset($employeeDutyMap[$employeeId])) {
-                            foreach ($employeeDutyMap[$employeeId] as $duty) {
-                                $dutyDate = Carbon::parse($duty['begin'])->startOfDay();
-                                $shiftStartDate = Carbon::parse($resource['begin'])->startOfDay();
-                                $shiftStartPrevDay = $shiftStartDate->copy()->subDay();
+                        $shiftBegin = Carbon::parse($resource['begin'], 'Europe/Vienna');
+                        $shiftEnd   = Carbon::parse($resource['end'], 'Europe/Vienna');
 
-                                if (Carbon::parse($duty['begin'])->eq(Carbon::parse($resource['begin']))) {
-                                    // Exact match with shift begin
-                                    $demandType = $duty['artid'];
-                                    break;
-                                } elseif ($dutyDate->eq($shiftStartDate)) {
-                                    // Match on the same day
-                                    $demandType = $duty['artid'];
-                                } elseif ($dutyDate->eq($shiftStartPrevDay)) {
-                                    // Match one day before
-                                    $demandType = $duty['artid'];
-                                }
-                            }
-                        }
+                        $demandType = $this->resolveShiftType($employeeId, $shiftBegin, $shiftEnd, $employeeDutyMap);
 
                         if (!in_array($resource['typid'] . '_X_' . $demandType, $demandTypeNames)) {
+                            if ($demandType === null || $demandType === '' || $demandType === '?') {
+                                $demandType = self::UNKNOWN_SHIFT_TYPE;
+                            }
                             $demandTypes[] = array('name' => $resource['typid'], 'shiftType' => $demandType); // Used for upsert
                             $demandTypeNames[] = $resource['typid'] . '_X_' . $demandType; // Custom key
                         }
@@ -191,6 +267,45 @@ class GrabShifts extends Command
                     }
                 }
             }
+
+
+            foreach ($shiftData['data']['pool'] as $shiftId => $pool) {
+                if (!empty($pool['mnr']) && !empty($pool['typid'])) {
+                    $employeeId = $pool['mnr'];
+                    if(!in_array($employeeId,$employeeIds)){
+                        $employees[] = array('remoteId' => $employeeId); //used for upsert later
+                        $employeeIds[] = $employeeId;
+                    }
+
+                    $shiftBegin = Carbon::parse($pool['begin'], 'Europe/Vienna');
+                    $shiftEnd   = Carbon::parse($pool['end'], 'Europe/Vienna');
+
+                    $demandType = $this->resolveShiftType($employeeId, $shiftBegin, $shiftEnd, $employeeDutyMap);
+
+                    if (!in_array($pool['typid'] . '_X_' . $demandType, $demandTypeNames)) {
+                        if ($demandType === null || $demandType === '' || $demandType === '?') {
+                            $demandType = self::UNKNOWN_SHIFT_TYPE;
+                        }
+                        $demandTypes[] = array('name' => $pool['typid'], 'shiftType' => $demandType); // Used for upsert
+                        $demandTypeNames[] = $pool['typid'] . '_X_' . $demandType; // Custom key
+                    }
+
+                    $shift = array(
+                        'employeeId' => $employeeId,
+                        'start' => Carbon::parse($pool['begin'], 'Europe/Vienna'),
+                        'end' => Carbon::parse($pool['end'], 'Europe/Vienna'),
+                        'demandType' => $pool['typid'] ?? '',
+                        'shiftType' => $demandType,
+                        'location' => $planId
+                    );
+                    $allShifts[] = $shift;
+                }
+            }
+
+
+
+
+
         }
         $lowestDate = Carbon::now()->addYears(100);
         $highestDate = Carbon::now()->subYears(100);
