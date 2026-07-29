@@ -13,14 +13,19 @@ use Throwable;
 class NrkVehicleStatusService
 {
     private const CACHE_KEY = 'nrk:vehicle-statuses:v1';
+    private const PROXY_URL = 'https://intern.rkhl.at/api/vehicle-statuses';
 
     public static function clearCache(): void
     {
         Cache::forget(self::CACHE_KEY);
     }
 
-    public function getStatuses(): array
+    public function getStatuses(?string $authorization = null): array
     {
+        if (app()->environment('local')) {
+            return $this->fetchFromProxy($authorization);
+        }
+
         $cacheHit = Cache::has(self::CACHE_KEY);
         $cacheSeconds = max(1, (int) config('custom.NRK_VEHICLE_STATUS_CACHE_SECONDS', 300));
 
@@ -33,6 +38,33 @@ class NrkVehicleStatusService
         );
 
         $payload['meta']['cache_hit'] = $cacheHit;
+
+        return $payload;
+    }
+
+    private function fetchFromProxy(?string $authorization): array
+    {
+        try {
+            $request = Http::acceptJson()->timeout(15);
+
+            if ($authorization !== null && $authorization !== '') {
+                $request = $request->withHeaders([
+                    'Authorization' => $authorization,
+                ]);
+            }
+
+            $response = $request->get(self::PROXY_URL);
+        } catch (Throwable $exception) {
+            throw new RuntimeException('NRK vehicle status proxy request failed.', 0, $exception);
+        }
+
+        $payload = $response->json();
+
+        if (!$response->successful() || !is_array($payload) || !isset($payload['data'])) {
+            throw new RuntimeException(
+                'NRK vehicle status proxy returned an unusable response (HTTP '.$response->status().').'
+            );
+        }
 
         return $payload;
     }

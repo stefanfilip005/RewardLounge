@@ -107,16 +107,21 @@ class EmployeesController extends Controller
 
         $employees = Employee::query()
             ->whereIn('remoteId', $validated['employeeIds'])
-            ->get(['remoteId'])
+            ->get(['remoteId', 'firstname', 'lastname'])
             ->keyBy('remoteId');
 
         $pictures = collect($validated['employeeIds'])
             ->filter(function ($employeeId) use ($employees) {
                 return $employees->has($employeeId);
             })
-            ->map(function ($employeeId) use ($pictureStorage) {
+            ->map(function ($employeeId) use ($employees, $pictureStorage) {
+                $employee = $employees->get($employeeId);
+
                 return [
                     'employeeId' => $employeeId,
+                    'firstname' => $employee->firstname,
+                    'lastname' => $employee->lastname,
+                    'name' => trim($employee->firstname.' '.$employee->lastname),
                     'pictureBase64' => $pictureStorage->getBase64($employeeId),
                 ];
             })
