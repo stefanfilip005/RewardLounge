@@ -10,8 +10,6 @@
     <style type="text/css">
         table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         table td { font-family: Arial, sans-serif; }
-        .fallback-total { background-color: #e8f5e9 !important; }
-        .reminder-bg { background-color: #fff8e1 !important; }
     </style>
     <noscript>
         <xml>
@@ -23,82 +21,58 @@
     <![endif]-->
 </head>
 <body bgcolor="#f0f2f5" style="margin:0; padding:0; width:100%; background-color:#f0f2f5; font-family:Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
-
-    <!-- Hidden preview text -->
     <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
-        Deine Bestellung #{{ $order->id }} ist abholbereit!
-        &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+        Deine Bestellung #{{ $order->id }} ist abholbereit.
+        &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
     </div>
 
-    <!-- Wrapper Table -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f0f2f5;">
         <tr>
-            <td align="center" style="padding: 30px 10px;">
-
-                <!-- Main Container 600px -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px; width:100%; background-color:#ffffff;">
-
-                    <!-- HEADER: Green band -->
+            <td align="center" style="padding:30px 10px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="width:100%; max-width:600px; background-color:#ffffff;">
                     <tr>
-                        <td style="background-color:#2e7d32; padding: 30px 35px; text-align:center;">
-                            <p style="margin:0 0 5px 0; color:#ffffff; font-size:22px; font-weight:bold;">Deine Bestellung ist abholbereit!</p>
-                            <p style="margin:0 0 15px 0; color:#c8e6c9; font-size:14px;">Rotes Kreuz Hollabrunn</p>
-                            <!-- Gold accent line -->
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                <tr>
-                                    <td style="height:3px; background-color:#FFA500; font-size:0; line-height:0;">&nbsp;</td>
-                                </tr>
-                            </table>
+                        <td align="center" bgcolor="#2e7d32" style="padding:30px 35px; background-color:#2e7d32;">
+                            <p style="margin:0 0 6px 0; color:#ffffff; font-size:22px; line-height:28px; font-weight:bold;">Deine Bestellung ist abholbereit!</p>
+                            <p style="margin:0; color:#d7ecd9; font-size:14px; line-height:20px;">Rotes Kreuz Hollabrunn</p>
                         </td>
                     </tr>
 
-                    <!-- BODY CONTENT -->
                     <tr>
-                        <td style="padding: 30px 35px 10px 35px;">
-
-                            <!-- Greeting -->
-                            <p style="margin:0 0 15px 0; color:#333333; font-size:18px; font-weight:600;">Hallo {{ $order->employee->firstname }},</p>
-
-                            <!-- Ready badge -->
+                        <td style="padding:30px 35px 10px 35px;">
+                            <p style="margin:0 0 15px 0; color:#333333; font-size:18px; line-height:24px; font-weight:bold;">Hallo {{ $order->employee->firstname }},</p>
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                                 <tr>
-                                    <td style="background-color:#e8f5e9; border-radius:20px; padding:8px 16px;">
-                                        <span style="color:#2e7d32; font-size:14px; font-weight:700;">&#9733; Bestellung #{{ $order->id }} fertig!</span>
+                                    <td bgcolor="#e8f5e9" style="padding:9px 15px; background-color:#e8f5e9; color:#2e7d32; font-size:13px; line-height:18px; font-weight:bold;">
+                                        &#10003;&nbsp; Bestellung #{{ $order->id }} abholbereit
                                     </td>
                                 </tr>
                             </table>
-
-                            <p style="margin:20px 0 25px 0; color:#555555; font-size:14px; line-height:1.6;">tolle Neuigkeiten! Deine Bestellung ist nun bereit f&#252;r die Abholung. Hier sind alle wichtigen Informationen:</p>
-
+                            <p style="margin:20px 0 25px 0; color:#555555; font-size:14px; line-height:22px;">Deine Bestellung kann ab sofort abgeholt werden. Hier findest du alle Informationen zur Abholung.</p>
                         </td>
                     </tr>
 
-                    <!-- PICK-UP INFO CARD (green) -->
                     <tr>
-                        <td style="padding: 0 35px 25px 35px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#e8f5e9; border:1px solid #c8e6c9;">
+                        <td style="padding:0 35px 25px 35px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#e8f5e9" style="background-color:#e8f5e9; border:1px solid #b9ddbc;">
                                 <tr>
                                     <td style="padding:20px;">
-                                        <p style="margin:0 0 12px 0; color:#2e7d32; font-size:15px; font-weight:700; padding-bottom:8px; border-bottom:1px solid #c8e6c9;">Abholung</p>
-                                        <!-- Location -->
+                                        <p style="margin:0 0 12px 0; padding-bottom:8px; border-bottom:1px solid #b9ddbc; color:#2e7d32; font-size:15px; line-height:20px; font-weight:bold;">Abholung</p>
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
-                                                <td width="65" style="padding:6px 0; color:#2e7d32; font-size:13px; font-weight:bold;">Ort</td>
-                                                <td style="padding:6px 0; color:#333333; font-size:14px;"><strong>Bezirksstelle Hollabrunn</strong></td>
+                                                <td width="80" valign="top" style="padding:6px 0; color:#2e7d32; font-size:13px; line-height:19px; font-weight:bold;">Ort</td>
+                                                <td style="padding:6px 0; color:#333333; font-size:14px; line-height:19px; font-weight:bold;">Bezirksstelle Hollabrunn</td>
                                             </tr>
-                                        </table>
-                                        <!-- Time -->
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
-                                                <td width="65" style="padding:6px 0; color:#2e7d32; font-size:13px; font-weight:bold;">Zeit</td>
-                                                <td style="padding:6px 0; color:#333333; font-size:14px;"><strong>Montag bis Freitag</strong> &mdash; 06:00 bis 22:00 Uhr</td>
+                                                <td width="80" valign="top" style="padding:6px 0; color:#2e7d32; font-size:13px; line-height:19px; font-weight:bold;">Zeit</td>
+                                                <td style="padding:6px 0; color:#333333; font-size:14px; line-height:19px;"><strong>Montag bis Freitag</strong> &mdash; 06:00 bis 22:00 Uhr</td>
                                             </tr>
-                                        </table>
-                                        <!-- Contact -->
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
-                                                <td width="65" style="padding:6px 0; color:#2e7d32; font-size:13px; font-weight:bold;">Kontakt</td>
-                                                <td style="padding:6px 0; color:#333333; font-size:14px;">Melde dich bitte bei unseren <strong>hauptberuflichen Kolleg:innen</strong> an der Bezirksstelle.</td>
+                                                <td width="80" valign="top" style="padding:6px 0; color:#2e7d32; font-size:13px; line-height:19px; font-weight:bold;">Kontakt</td>
+                                                <td style="padding:6px 0; color:#333333; font-size:14px; line-height:19px;">Melde dich bei den hauptberuflichen Kolleg:innen an der Bezirksstelle.</td>
+                                            </tr>
+                                            <tr>
+                                                <td width="80" valign="top" style="padding:6px 0; color:#2e7d32; font-size:13px; line-height:19px; font-weight:bold;">Best&auml;tigung</td>
+                                                <td style="padding:6px 0; color:#333333; font-size:14px; line-height:19px;">Bei der &Uuml;bergabe wird die Abholbest&auml;tigung unterschrieben.</td>
                                             </tr>
                                         </table>
                                     </td>
@@ -107,38 +81,27 @@
                         </td>
                     </tr>
 
-                    <!-- ORDER INFO CARD -->
                     <tr>
-                        <td style="padding: 0 35px 25px 35px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f8f9fa; border:1px solid #e9ecef;">
+                        <td style="padding:0 35px 25px 35px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#f8f9fa" style="background-color:#f8f9fa; border:1px solid #e1e5e8;">
                                 <tr>
                                     <td style="padding:20px;">
-                                        <!-- Bestellnummer -->
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
-                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; font-weight:500;">Bestellnummer</td>
-                                                <td style="padding:4px 0; color:#333333; font-size:15px; font-weight:bold; color:#2e7d32;">#{{ $order->id }}</td>
+                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; line-height:18px;">Bestellnummer</td>
+                                                <td style="padding:4px 0; color:#2e7d32; font-size:15px; line-height:18px; font-weight:bold;">#{{ $order->id }}</td>
                                             </tr>
-                                        </table>
-                                        <!-- Personalnummer -->
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
-                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; font-weight:500;">Personalnummer</td>
-                                                <td style="padding:4px 0; color:#333333; font-size:14px; font-weight:600;">{{ $order->remoteId }}</td>
+                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; line-height:18px;">Personalnummer</td>
+                                                <td style="padding:4px 0; color:#333333; font-size:14px; line-height:18px; font-weight:bold;">{{ $order->remoteId }}</td>
                                             </tr>
-                                        </table>
-                                        <!-- Bestelldatum -->
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
-                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; font-weight:500;">Bestelldatum</td>
-                                                <td style="padding:4px 0; color:#333333; font-size:14px; font-weight:600;">{{ \Carbon\Carbon::parse($order->created_at_datetime)->timezone('Europe/Vienna')->format('d.m.Y \u\m H:i') }} Uhr</td>
+                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; line-height:18px;">Bestelldatum</td>
+                                                <td style="padding:4px 0; color:#333333; font-size:14px; line-height:18px; font-weight:bold;">{{ \Carbon\Carbon::parse($order->created_at_datetime)->timezone('Europe/Vienna')->format('d.m.Y \u\m H:i') }} Uhr</td>
                                             </tr>
-                                        </table>
-                                        <!-- Abholbereit seit -->
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
-                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; font-weight:500;">Abholbereit seit</td>
-                                                <td style="padding:4px 0; color:#333333; font-size:14px; font-weight:600;">{{ $order->state_3_datetime ? \Carbon\Carbon::parse($order->state_3_datetime)->timezone('Europe/Vienna')->format('d.m.Y \u\m H:i') . ' Uhr' : 'Nicht verfügbar' }}</td>
+                                                <td width="140" style="padding:4px 0; color:#6c757d; font-size:13px; line-height:18px;">Abholbereit seit</td>
+                                                <td style="padding:4px 0; color:#333333; font-size:14px; line-height:18px; font-weight:bold;">{{ $order->state_3_datetime ? \Carbon\Carbon::parse($order->state_3_datetime)->timezone('Europe/Vienna')->format('d.m.Y \u\m H:i').' Uhr' : 'Nicht verfügbar' }}</td>
                                             </tr>
                                         </table>
                                     </td>
@@ -147,15 +110,14 @@
                         </td>
                     </tr>
 
-                    <!-- HANDLED BY -->
                     @if($handledBy)
                     <tr>
-                        <td style="padding: 0 35px 25px 35px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f8f9fa; border:1px solid #e9ecef;">
+                        <td style="padding:0 35px 25px 35px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#f8f9fa" style="background-color:#f8f9fa; border:1px solid #e1e5e8;">
                                 <tr>
                                     <td style="padding:15px 20px;">
-                                        <p style="margin:0 0 5px 0; color:#6c757d; font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px;">&#10003; Abholbereit gemacht von</p>
-                                        <p style="margin:0; color:#333333; font-size:14px; font-weight:600;">{{ $handledBy->firstname }} {{ $handledBy->lastname }}</p>
+                                        <p style="margin:0 0 5px 0; color:#6c757d; font-size:12px; line-height:17px; text-transform:uppercase; letter-spacing:0.5px;">&#10003;&nbsp; Abholbereit gemacht von</p>
+                                        <p style="margin:0; color:#333333; font-size:14px; line-height:19px; font-weight:bold;">{{ $handledBy->firstname }} {{ $handledBy->lastname }}</p>
                                     </td>
                                 </tr>
                             </table>
@@ -163,41 +125,43 @@
                     </tr>
                     @endif
 
-                    <!-- PRODUCTS SECTION TITLE -->
                     <tr>
-                        <td style="padding: 0 35px 15px 35px;">
+                        <td style="padding:0 35px 15px 35px;">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
-                                    <td style="border-bottom:2px solid #2e7d32; padding:0 0 8px 0;">
-                                        <span style="color:#333333; font-size:16px; font-weight:700;">Deine Produkte</span>
-                                    </td>
+                                    <td style="padding:0 0 8px 0; border-bottom:2px solid #2e7d32; color:#333333; font-size:16px; line-height:22px; font-weight:bold;">Deine Produkte</td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- PRODUCTS LIST -->
                     @foreach($order->orderItems as $item)
                     <tr>
-                        <td style="padding: 0 35px 12px 35px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border:1px solid #e9ecef;">
+                        <td style="padding:0 35px 12px 35px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border:1px solid #e1e5e8;">
                                 <tr>
-                                    <!-- Quantity Column -->
-                                    <td width="90" style="padding:12px 10px 12px 12px; background-color:#fafafa; text-align:center; vertical-align:middle;">
-                                        <span style="color:#2e7d32; font-size:20px; font-weight:bold;">{{ $item->quantity }}&times;</span>
-                                    </td>
-                                    <!-- Product Details Column -->
-                                    <td style="padding:12px 15px 12px 12px; vertical-align:middle;">
-                                        <p style="margin:0 0 3px 0; color:#333333; font-size:14px; font-weight:600;">{{ $item->name }}</p>
-                                        @if($item->slogan && $item->slogan !== '')
-                                        <p style="margin:0 0 5px 0; color:#6c757d; font-size:12px;">{{ $item->slogan }}</p>
+                                    <td width="112" align="center" valign="middle" bgcolor="#f8f9fa" style="width:112px; padding:12px; background-color:#f8f9fa;">
+                                        @if(isset($productImagePaths[$item->getKey()]))
+                                            <img src="{{ $message->embed($productImagePaths[$item->getKey()]) }}" width="88" alt="{{ $item->name }}" style="display:block; width:88px; max-width:88px; height:auto; max-height:88px; border:0; outline:none; text-decoration:none;">
+                                        @else
+                                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="88" height="70" style="width:88px; height:70px; border:1px solid #d8dde1;">
+                                                <tr>
+                                                    <td align="center" valign="middle" style="color:#8a939b; font-size:11px; line-height:15px;">Kein Bild</td>
+                                                </tr>
+                                            </table>
                                         @endif
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-                                            <tr>
-                                                <td style="padding-right:20px; color:#555555; font-size:12px;">Einzelpreis: {{ number_format($item->points, 0, ',', '.') }} Punkte</td>
-                                                <td style="color:#2e7d32; font-size:13px; font-weight:700;">{{ number_format($item->points * $item->quantity, 0, ',', '.') }} Punkte</td>
-                                            </tr>
-                                        </table>
+                                    </td>
+                                    <td valign="top" style="padding:14px 15px;">
+                                        <p style="margin:0 0 3px 0; color:#333333; font-size:14px; line-height:19px; font-weight:bold;">{{ $item->name }}</p>
+                                        @if($item->slogan)
+                                            <p style="margin:0 0 8px 0; color:#6c757d; font-size:12px; line-height:17px;">{{ \Illuminate\Support\Str::limit(strip_tags($item->slogan), 180) }}</p>
+                                        @endif
+                                        <p style="margin:0 0 3px 0; color:#555555; font-size:12px; line-height:17px;"><strong>Menge:</strong> {{ $item->quantity }}</p>
+                                        <p style="margin:0; color:#555555; font-size:12px; line-height:17px;">Einzelpreis: {{ number_format($item->points, 0, ',', '.') }} Punkte</p>
+                                        <p style="margin:2px 0 0 0; color:#8B0000; font-size:13px; line-height:18px; font-weight:bold;">Summe: {{ number_format($item->points * $item->quantity, 0, ',', '.') }} Punkte</p>
+                                        @if($item->note)
+                                            <p style="margin:8px 0 0 0; padding-top:7px; border-top:1px solid #eceff1; color:#8B0000; font-size:12px; line-height:17px;">&#9998;&nbsp; Notiz: {{ $item->note }}</p>
+                                        @endif
                                     </td>
                                 </tr>
                             </table>
@@ -205,57 +169,30 @@
                     </tr>
                     @endforeach
 
-                    <!-- TOTAL ROW -->
                     <tr>
-                        <td style="padding: 5px 35px 25px 35px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="fallback-total" style="background-color:#e8f5e9; border:2px solid #2e7d32;">
+                        <td style="padding:5px 35px 30px 35px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#8B0000" style="background-color:#8B0000; border:2px solid #8B0000;">
                                 <tr>
-                                    <td style="padding:15px 20px;">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                            <tr>
-                                                <td style="color:#333333; font-size:15px; font-weight:700;">Gesamtkosten</td>
-                                                <td align="right" style="color:#2e7d32; font-size:18px; font-weight:800;">{{ number_format($order->total_points, 0, ',', '.') }} Punkte</td>
-                                            </tr>
-                                        </table>
-                                    </td>
+                                    <td style="padding:17px 20px; color:#ffffff; font-size:15px; line-height:20px; font-weight:bold;">Gesamtpunkte</td>
+                                    <td align="right" style="padding:17px 20px; color:#ffffff; font-size:20px; line-height:22px; font-weight:bold; white-space:nowrap;">{{ number_format($order->total_points, 0, ',', '.') }} Punkte</td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-
-                    <!-- REMINDER (yellow) -->
-                    <tr>
-                        <td style="padding: 0 35px 25px 35px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="reminder-bg" style="background-color:#fff8e1; border-left:4px solid #FFC107;">
-                                <tr>
-                                    <td style="padding:15px 20px;">
-                                        <p style="margin:0 0 3px 0; color:#795548; font-size:14px; font-weight:700;">Wichtig</p>
-                                        <p style="margin:0; color:#795548; font-size:13px; line-height:1.5;">Bitte gib bei der Abholung deine Personalnummer {{ $order->remoteId }} an. Falls du Fragen hast, wende dich gerne an unser Team.</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
                 </table>
-                <!-- /Main Container -->
 
-                <!-- FOOTER -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px; width:100%; background-color:#f8f9fa; border-top:1px solid #e9ecef;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" bgcolor="#f8f9fa" style="width:100%; max-width:600px; background-color:#f8f9fa; border-top:1px solid #e1e5e8;">
                     <tr>
-                        <td style="padding:25px 35px; text-align:center;">
-                            <p style="margin:0 0 8px 0; color:#6c757d; font-size:12px;">{{ \Carbon\Carbon::now('Europe/Vienna')->format('d.m.Y \u\m H:i') }} Uhr</p>
-                            <p style="margin:0 0 10px 0;">
-                                <a href="https://intern.rkhl.at" style="color:#2e7d32; font-size:14px; font-weight:600; text-decoration:none;">&#8594; Weiter zu intern.rkhl.at</a>
+                        <td align="center" style="padding:23px 35px;">
+                            <p style="margin:0 0 9px 0; color:#6c757d; font-size:12px; line-height:17px;">{{ \Carbon\Carbon::now('Europe/Vienna')->format('d.m.Y \u\m H:i') }} Uhr</p>
+                            <p style="margin:0;">
+                                <a href="https://intern.rkhl.at" style="color:#2e7d32; font-size:14px; line-height:20px; font-weight:bold; text-decoration:none;">&#8594; Weiter zu intern.rkhl.at</a>
                             </p>
-                            <p style="margin:0; color:#6c757d; font-size:11px; font-weight:500;">Rotes Kreuz Hollabrunn</p>
                         </td>
                     </tr>
                 </table>
-
             </td>
         </tr>
     </table>
-
 </body>
 </html>
