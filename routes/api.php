@@ -19,6 +19,7 @@ use App\Http\Controllers\API\EmployeeShiftCountController;
 use App\Jobs\ProcessPoints;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 
@@ -195,10 +196,9 @@ Route::get('startPointsCalculationForAllEmployees',function(Request $request){
     echo "Punkte werden im Hintergrund berechnet, das kann 1-2 Minuten dauern";
 });
 Route::get('startRankingCalculation',function(Request $request){
-    //$year = 2023;
-    //EmployeesController::calculateRankings($year);
-    //$year = 2024;
-    //EmployeesController::calculateRankings($year);
-    $year = 2025;
-    EmployeesController::calculateRankings($year);
+    Artisan::call('command:calculateRanking');
+
+    return response()->json([
+        'message' => trim(Artisan::output()) ?: 'Ranking calculated successfully',
+    ]);
 });

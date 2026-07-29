@@ -133,8 +133,12 @@ class EmployeesController extends Controller
         $rankings = collect();
         $locations = [null, 38, 39, 82, 3316]; // Array of locations including null
 
-        foreach ([2023, 2024, 2025] as $year) {
-        //foreach ([2025] as $year) {
+        $availableYears = Ranking::query()
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year');
+
+        foreach ($availableYears as $year) {
             foreach ($locations as $location) {
                 // Modify the query to consider location
                 $ranking = Ranking::where('year', $year)

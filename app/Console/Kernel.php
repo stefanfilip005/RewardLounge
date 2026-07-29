@@ -22,7 +22,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:grabEmployees')->dailyAt('02:05');
         $schedule->command('command:grabShifts')->dailyAt('02:10');
         $schedule->command('command:calculatePoints')->dailyAt('02:20');
-        $schedule->command('command:calculateRanking')->dailyAt('02:40');
+
+        $schedule->command('command:calculateRanking')
+            ->dailyAt('02:40')
+            ->withoutOverlapping();
 
         $schedule->command('command:cache-prefill-shifts')->dailyAt('02:50');
 
