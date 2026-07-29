@@ -42,7 +42,7 @@
                     <tr>
                         <td style="background-color:#2e7d32; padding: 30px 35px; text-align:center;">
                             <p style="margin:0 0 5px 0; color:#ffffff; font-size:22px; font-weight:bold;">Deine Bestellung ist abholbereit!</p>
-                            <p style="margin:0 0 15px 0; color:#c8e6c9; font-size:14px;">Rotes Kreuz Hollabrunn &mdash; Reward Lounge</p>
+                            <p style="margin:0 0 15px 0; color:#c8e6c9; font-size:14px;">Rotes Kreuz Hollabrunn</p>
                             <!-- Gold accent line -->
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
@@ -248,7 +248,7 @@
                             <p style="margin:0 0 10px 0;">
                                 <a href="https://intern.rkhl.at" style="color:#2e7d32; font-size:14px; font-weight:600; text-decoration:none;">&#8594; Weiter zu intern.rkhl.at</a>
                             </p>
-                            <p style="margin:0; color:#6c757d; font-size:11px; font-weight:500;">Reward Lounge &mdash; Rotes Kreuz Hollabrunn</p>
+                            <p style="margin:0; color:#6c757d; font-size:11px; font-weight:500;">Rotes Kreuz Hollabrunn</p>
                         </td>
                     </tr>
                 </table>

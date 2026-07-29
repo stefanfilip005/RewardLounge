@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Order;
+use App\Support\OrderEmailImages;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -24,6 +25,9 @@ class OrderPlacedForCustomer extends Mailable
         $this->order->loadMissing(['employee', 'orderItems']);
 
         return $this->view('emails.orderPlacedForCustomer')
+                    ->with([
+                        'productImagePaths' => OrderEmailImages::productPaths($this->order),
+                    ])
                     ->subject('Bestellbestätigung - Rotes Kreuz Hollabrunn - Intern');
     }
 }
