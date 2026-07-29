@@ -31,18 +31,16 @@
             <td align="center" style="padding:30px 10px;">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="width:100%; max-width:600px; background-color:#ffffff;">
                     <tr>
-                        <td align="center" bgcolor="#1a1a2e" style="padding:27px 35px 25px 35px; background-color:#1a1a2e;">
+                        <td align="center" bgcolor="#1a1a2e" style="padding:27px 35px 0 35px; background-color:#1a1a2e;">
                             <p style="margin:0; color:#ffffff; font-size:21px; line-height:28px; font-weight:bold;">Rotes Kreuz Hollabrunn</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" bgcolor="#1a1a2e" style="padding:16px 35px 25px 35px; background-color:#1a1a2e;">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
                                 <tr>
-                                    <td style="padding-top:16px;">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
-                                            <tr>
-                                                <td align="center" valign="middle" bgcolor="#FFD700" height="34" style="height:34px; padding:0 16px; background-color:#FFD700; color:#1a1a2e; font-size:11px; line-height:34px; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">
-                                                    &#9889;&nbsp; Neue Bestellung
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <td align="center" valign="middle" bgcolor="#FFD700" style="padding:9px 16px; background-color:#FFD700; color:#1a1a2e; font-size:11px; line-height:16px; mso-line-height-rule:exactly; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">
+                                        &#9889;&nbsp; Neue Bestellung
                                     </td>
                                 </tr>
                             </table>
