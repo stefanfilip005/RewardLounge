@@ -3,13 +3,17 @@
 namespace App\Console\Commands;
 
 use App\Models\Employee;
-use App\Models\Shift;
-use Carbon\Carbon;
+use App\Services\EmployeePictureStorage;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Config;
 
 class GrabEmployeePictures extends Command
 {
+    /**
+     * NRK-Hosting permits at most 60 requests per minute per API key.
+     * Keep headroom for interactive requests made by application users.
+     */
+    private const NRK_REQUEST_DELAY_MICROSECONDS = 2000000;
+
     /**
      * The name and signature of the console command.
      *
@@ -39,9 +43,9 @@ class GrabEmployeePictures extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(EmployeePictureStorage $pictureStorage)
     {
-        $employees = Employee::get();
+        $employees = Employee::get(['remoteId']);
         foreach($employees as $employee){
             $apicall = array();
             $apicall['mnr'] = $employee->remoteId;
@@ -55,16 +59,22 @@ class GrabEmployeePictures extends Command
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apicall));
             curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'NRK-AUTH: '.config('custom.NRKAPIKEY'), 'Content-Type:application/json' ));
             $return = curl_exec ($ch);
-            if(strlen($return) < 5){
-                return;
+            curl_close($ch);
+            if(!is_string($return) || strlen($return) < 5){
+                $this->warn("Foto für Mitarbeiter {$employee->remoteId} konnte nicht abgerufen werden.");
+                usleep(self::NRK_REQUEST_DELAY_MICROSECONDS);
+                continue;
             }
             $return = json_decode($return, true);
-            if(isset($return['data']) && strlen($return['data']) > 500){
-                $employee->picture_base64 = $return['data'];
-                $employee->save();
+            if(isset($return['data']) && is_string($return['data']) && strlen($return['data']) > 500){
+                if (!$pictureStorage->putBase64($employee->remoteId, $return['data'])) {
+                    $this->warn("NRK lieferte für Mitarbeiter {$employee->remoteId} kein gültiges Foto.");
+                }
             }
-            usleep(200000); // 0.2 seconds
+            // Two seconds means at most 30 requests/minute for this import.
+            usleep(self::NRK_REQUEST_DELAY_MICROSECONDS);
         }
 
+        return 0;
     }
 }

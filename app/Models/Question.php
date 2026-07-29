@@ -10,6 +10,10 @@ class Question extends Model
     use HasFactory;
     protected $fillable = ['text', 'is_active'];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     public function answers()
     {
         return $this->hasMany(Answer::class);
@@ -17,6 +21,6 @@ class Question extends Model
 
     public function responses()
     {
-        return $this->hasManyThrough(QuestionResponse::class, Answer::class);
+        return $this->hasMany(QuestionResponse::class);
     }
 }

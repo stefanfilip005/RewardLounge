@@ -21,6 +21,8 @@ class OrderPlacedForCustomer extends Mailable
 
     public function build()
     {
+        $this->order->loadMissing(['employee', 'orderItems']);
+
         return $this->view('emails.orderPlacedForCustomer')
                     ->subject('Bestellbestätigung - Rotes Kreuz Hollabrunn - Intern');
     }

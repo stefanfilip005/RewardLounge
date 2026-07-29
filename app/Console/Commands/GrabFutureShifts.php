@@ -7,6 +7,9 @@ use App\Models\Employee;
 use App\Models\FutureOpenShift;
 use App\Models\FutureShift;
 use App\Models\Shift;
+use App\Models\Vehicle;
+use App\Services\NrkVehicleStatusService;
+use App\Support\VehicleCallsign;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
@@ -91,6 +94,7 @@ class GrabFutureShifts extends Command
         //$plans['data'][4748] = 'KI-Team Hollabrunn';
 
         $allShifts = [];
+        $vehicleCallsigns = [];
 
         // Iterate over each plan and make an API call
         foreach ($plans['data'] as $planId => $planName) {
@@ -129,6 +133,14 @@ class GrabFutureShifts extends Command
         
             foreach ($shiftData['data']['plan'] as $shiftId => $shift) {
                 foreach ($shift['ressources'] as $resource) {
+                    if (($resource['typid'] ?? null) === 'KFZ') {
+                        $callsign = VehicleCallsign::normalize($resource['ressource'] ?? null);
+
+                        if ($callsign !== null) {
+                            $vehicleCallsigns[$callsign] = true;
+                        }
+                    }
+
                     if (!empty($resource['mnr']) && !empty($resource['typid']) && in_array($resource['typid'], $validKlasses)) {
                         $allShifts[] = [
                             'shift_id' => $shiftId,
@@ -144,6 +156,37 @@ class GrabFutureShifts extends Command
                         ];
                     }
                 }
+            }
+        }
+
+        if (!empty($vehicleCallsigns)) {
+            $seenAt = now();
+            $vehicleRows = [];
+            $activeCallsigns = Vehicle::query()
+                ->where('active', true)
+                ->whereIn('funkkennung', array_keys($vehicleCallsigns))
+                ->pluck('funkkennung')
+                ->all();
+            $catalogChanged = count($activeCallsigns) !== count($vehicleCallsigns);
+
+            foreach (array_keys($vehicleCallsigns) as $callsign) {
+                $vehicleRows[] = [
+                    'funkkennung' => $callsign,
+                    'active' => true,
+                    'last_seen_at' => $seenAt,
+                    'created_at' => $seenAt,
+                    'updated_at' => $seenAt,
+                ];
+            }
+
+            Vehicle::upsert(
+                $vehicleRows,
+                ['funkkennung'],
+                ['active', 'last_seen_at', 'updated_at']
+            );
+
+            if ($catalogChanged) {
+                NrkVehicleStatusService::clearCache();
             }
         }
         

@@ -11,6 +11,11 @@ use App\Http\Controllers\API\GiftedPointsController;
 use App\Http\Controllers\API\GreetingController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\BallSlotsController;
+use App\Http\Controllers\API\QuestionController;
+use App\Http\Controllers\API\QuestionResponseController;
+use App\Http\Controllers\API\AnswerController;
+use App\Http\Controllers\API\VehicleStatusController;
+use App\Http\Controllers\API\EmployeeShiftCountController;
 use App\Jobs\ProcessPoints;
 use App\Models\Employee;
 use Illuminate\Http\Request;
@@ -66,6 +71,7 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     Route::get('rewards', [RewardsController::class, 'index']);
     Route::get('rewards/{reward}', [RewardsController::class, 'show']);
     Route::get('greeting', [GreetingController::class, 'show']); // Redis cached
+    Route::get('vehicles', [VehicleStatusController::class, 'index']);
     Route::get('faqs', [FAQController::class, 'index']);
     //Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']); // Redis cached
@@ -81,19 +87,14 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     // If we would like this, then we need to make a shiftResource without start,end,lastPointCalculation
     Route::get("employeesForRanking", [EmployeesController::class, 'getEmployeesForRanking']);
     Route::get("shiftsForRanking", [EmployeesController::class, 'getShiftsForRanking']);
+    Route::post("employee-pictures", [EmployeesController::class, 'pictures']);
 
-    Route::get('ball-slots', [BallSlotsController::class, 'index']);
-    Route::post('ball-slots/{slot}/self-register', [BallSlotsController::class, 'selfRegister']);
+        Route::get('ball-slots', [BallSlotsController::class, 'index']);
+        Route::post('ball-slots/{slot}/self-register', [BallSlotsController::class, 'selfRegister']);
+
+        Route::get('self/questions', [QuestionResponseController::class, 'active']);
+        Route::post('self/questions/{question}/response', [QuestionResponseController::class, 'store']);
 });
-
-
-
-Route::apiResource('questions', 'QuestionController');
-Route::post('questions/{question}/activate', 'QuestionController@activate');
-Route::post('questions/{question}/deactivate', 'QuestionController@deactivate');
-Route::apiResource('questions.answers', 'AnswerController')->shallow();
-Route::post('questions/{question}/answers/{answer}/respond', 'QuestionResponseController@store');
-
 
 /*
  * ----------------------------------------------------------------
@@ -118,6 +119,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->group(function () {
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
+    Route::get("employee-shift-counts", EmployeeShiftCountController::class);
     Route::get("shiftsForEmployee", [EmployeesController::class, 'shiftsForEmployee']);
     Route::get("employeeFromId", [EmployeesController::class, 'employeeFromId']);
     Route::get('pointStatistic', [RewardsController::class, 'getPointStatistic']); 
@@ -162,6 +164,13 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.admin')->group(func
     
     Route::post('gifted-points', [GiftedPointsController::class, 'index']);
     Route::post('update-gifted-points', [GiftedPointsController::class, 'update']);
+
+    Route::apiResource('questions', QuestionController::class)->except(['show']);
+    Route::post('questions/{question}/activate', [QuestionController::class, 'activate']);
+    Route::post('questions/{question}/deactivate', [QuestionController::class, 'deactivate']);
+    Route::post('questions/{question}/answers', [AnswerController::class, 'store']);
+    Route::put('question-answers/{answer}', [AnswerController::class, 'update']);
+    Route::delete('question-answers/{answer}', [AnswerController::class, 'destroy']);
     
     //Route::apiResource('gifted-points', GiftedPointsController::class)->only(['index', 'update', 'destroy']);
 });

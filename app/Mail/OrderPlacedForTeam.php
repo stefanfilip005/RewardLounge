@@ -21,6 +21,8 @@ class OrderPlacedForTeam extends Mailable
 
     public function build()
     {
+        $this->order->loadMissing(['employee', 'orderItems']);
+
         return $this->view('emails.orderPlacedForTeam')
                     ->subject('[intern.rkhl.at] - Neue Bestellung eingegangen!');
     }

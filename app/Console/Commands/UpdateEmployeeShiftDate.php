@@ -11,6 +11,8 @@ use Carbon\Carbon;
 
 class UpdateEmployeeShiftDate extends Command
 {
+    private const TIMEZONE = 'Europe/Vienna';
+
     protected $signature = 'command:employees-update-shift-date {--full : Consider all shifts instead of the last week}';
     protected $description = 'Updates each employee\'s last shift date based on the most recent shift';
 
@@ -42,27 +44,27 @@ class UpdateEmployeeShiftDate extends Command
         DB::beginTransaction();
         try {
             // Find and update next shift dates for employees with future shifts
-            $today = Carbon::now()->startOfDay();
-            $futureShifts = FutureShift::where('date', '>=', $today)
-                ->orderBy('date', 'asc')
+            $now = Carbon::now(self::TIMEZONE);
+            $futureShifts = FutureShift::where('begin', '>', $now->format('Y-m-d H:i:s'))
+                ->orderBy('begin', 'asc')
                 ->get();
 
             // Collect unique employee identifiers from future shifts
             $employeeUpdates = [];
             foreach ($futureShifts as $shift) {
                 $employeeId = $shift->employee_id;
-                // Only store the earliest date found for each remoteId
-                if (!isset($employeeUpdates[$employeeId]) || new Carbon($shift->date) < new Carbon($employeeUpdates[$employeeId])) {
-                    $employeeUpdates[$employeeId] = $shift->date;
+                // The shifts are ordered by begin, so the first one is the next shift.
+                if (!isset($employeeUpdates[$employeeId])) {
+                    $employeeUpdates[$employeeId] = Carbon::parse($shift->begin, self::TIMEZONE)
+                        ->format('Y-m-d H:i:s');
                 }
             }
 
             foreach (array_chunk($employeeUpdates, 200, true) as $chunk) {
-                DB::statement(
-                    "UPDATE employees SET next_shift_date = CASE " .
-                    implode(' ', array_map(fn($id, $date) => "WHEN remoteId = '$id' THEN '$date'", array_keys($chunk), $chunk)) .
-                    " END WHERE remoteId IN (" . implode(',', array_map('intval', array_keys($chunk))) . ")"
-                );
+                foreach ($chunk as $employeeId => $nextShift) {
+                    Employee::where('remoteId', $employeeId)
+                        ->update(['next_shift_date' => $nextShift]);
+                }
             }
             DB::commit();
         } catch (\Exception $e) {

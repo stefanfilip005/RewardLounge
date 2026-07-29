@@ -16,6 +16,7 @@ use App\Http\Resources\StatisticShiftResource;
 use App\Models\Course;
 use App\Models\Ranking;
 use App\Models\Shift;
+use App\Services\EmployeePictureStorage;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -95,6 +96,33 @@ class EmployeesController extends Controller
     
     public function userProfile(Request $request){
         return EmployeeResource::make($request->user());
+    }
+
+    public function pictures(Request $request, EmployeePictureStorage $pictureStorage)
+    {
+        $validated = $request->validate([
+            'employeeIds' => 'required|array|max:100',
+            'employeeIds.*' => 'required|integer|distinct',
+        ]);
+
+        $employees = Employee::query()
+            ->whereIn('remoteId', $validated['employeeIds'])
+            ->get(['remoteId'])
+            ->keyBy('remoteId');
+
+        $pictures = collect($validated['employeeIds'])
+            ->filter(function ($employeeId) use ($employees) {
+                return $employees->has($employeeId);
+            })
+            ->map(function ($employeeId) use ($pictureStorage) {
+                return [
+                    'employeeId' => $employeeId,
+                    'pictureBase64' => $pictureStorage->getBase64($employeeId),
+                ];
+            })
+            ->values();
+
+        return response()->json(['data' => $pictures]);
     }
     
 

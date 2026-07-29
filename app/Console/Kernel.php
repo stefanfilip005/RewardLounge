@@ -30,6 +30,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:employees-update-shift-date')->hourlyAt('18');
 
         $schedule->command('command:grabEmployeePictures')->monthly();
+        $schedule->command('command:syncVehicles')->monthlyOn(1, '03:00');
     }
 
     /**

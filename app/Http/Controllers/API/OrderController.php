@@ -12,6 +12,7 @@ use App\Mail\OrderReadyForTakeaway;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\EmployeePictureStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Codedge\Fpdf\Fpdf\Fpdf;
@@ -20,7 +21,12 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
+    private $employeePictureStorage;
 
+    public function __construct(EmployeePictureStorage $employeePictureStorage)
+    {
+        $this->employeePictureStorage = $employeePictureStorage;
+    }
 
     public function generatePDF($id)
     {
@@ -110,42 +116,14 @@ class OrderController extends Controller
 
 
 
-        $imageBase64 = $employee->picture_base64;
-        if(strlen($imageBase64) < 100){
+        $imagePath = $this->employeePictureStorage->absolutePath($employee->remoteId);
+        if($imagePath === null || !is_readable($imagePath)){
             $pdf->SetTextColor(150,150,150);
             $pdf->SetDrawColor(100,100,100);
             $pdf->Rect(15, 32.5, 25, 30, 0);
             $pdf->Text(20, 47.5, 'Kein Foto');
         }else{
-            $parts = explode(',', $imageBase64, 2);
-            $dataType = $parts[0]; // Contains data type and encoding information
-            $base64 = $parts[1];
-            $imageData = base64_decode($base64);
-            
-            if (getimagesizefromstring($imageData) === false) {
-                die('Decoded data is not a valid image.');
-            }
-            
-            // Extract MIME type
-            preg_match('/^data:image\/(\w+);/', $dataType, $matches);
-            if (!$matches) {
-                die('Could not determine the image type.');
-            }
-            
-            // Determine the correct file extension based on MIME type
-            $imageType = strtolower($matches[1]);
-            if ($imageType === 'jpeg') {
-                $imageType = 'jpg'; // Normalize jpeg to jpg
-            }
-            $imagePath = storage_path('app/public/temp_image.' . $imageType);
-            
-            // Save image file with the correct extension
-            file_put_contents($imagePath, $imageData);
-            if (!file_exists($imagePath) || !is_readable($imagePath)) {
-                die("The file does not exist or is not readable: $imagePath");
-            }
             $pdf->Image($imagePath, 15, 30, 25);
-            unlink($imagePath);
         }
 
 
