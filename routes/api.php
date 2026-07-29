@@ -72,7 +72,7 @@ Route::middleware('auth:sanctum', 'log.pageview')->group(function () {
     Route::get('rewards', [RewardsController::class, 'index']);
     Route::get('rewards/{reward}', [RewardsController::class, 'show']);
     Route::get('greeting', [GreetingController::class, 'show']); // Redis cached
-    Route::get('vehicles', [VehicleStatusController::class, 'index']);
+    Route::get('vehicle-statuses', [VehicleStatusController::class, 'index']);
     Route::get('faqs', [FAQController::class, 'index']);
     //Route::get("teamEmployees", [EmployeesController::class, 'teamEmployees']);
     Route::get('/infoblaetter/{year}', [InfoblattController::class, 'getInfoblaetter']); // Redis cached
