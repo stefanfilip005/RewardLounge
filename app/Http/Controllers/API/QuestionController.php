@@ -10,12 +10,34 @@ class QuestionController extends Controller
 {
     public function index()
     {
-        return Question::with(['answers' => function ($query) {
-            $query->withCount('responses')->orderBy('id');
+        $questions = Question::with(['answers' => function ($query) {
+            $query->withCount('responses')
+                ->with(['voters' => function ($query) {
+                    $query->select('employees.id', 'employees.firstname', 'employees.lastname');
+                }])
+                ->orderBy('id');
         }])
             ->withCount('responses')
             ->latest()
             ->get();
+
+        $questions->each(function (Question $question) {
+            $question->answers->each(function ($answer) {
+                // Keep responses_count for backwards compatibility and expose the
+                // existing count under the API's more descriptive votes field too.
+                $answer->setAttribute('votes', $answer->responses_count);
+                $answer->setAttribute('voters', $answer->voters->map(function ($employee) {
+                    return [
+                        'id' => $employee->id,
+                        'firstname' => $employee->firstname,
+                        'lastname' => $employee->lastname,
+                    ];
+                })->values());
+                $answer->unsetRelation('voters');
+            });
+        });
+
+        return $questions;
     }
 
     public function store(Request $request)

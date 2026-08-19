@@ -20,6 +20,16 @@ class Answer extends Model
         return $this->hasMany(QuestionResponse::class);
     }
 
+    public function voters()
+    {
+        return $this->belongsToMany(
+            Employee::class,
+            'question_responses',
+            'answer_id',
+            'employee_id'
+        );
+    }
+
     public function getPercentageAttribute()
     {
         $totalResponses = $this->responses()->count();
