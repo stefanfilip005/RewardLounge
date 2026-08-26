@@ -107,7 +107,7 @@ class EmployeesController extends Controller
 
         $employees = Employee::query()
             ->whereIn('remoteId', $validated['employeeIds'])
-            ->get(['remoteId', 'firstname', 'lastname'])
+            ->get(['remoteId', 'firstname', 'lastname', 'phone'])
             ->keyBy('remoteId');
 
         $pictures = collect($validated['employeeIds'])
@@ -122,6 +122,7 @@ class EmployeesController extends Controller
                     'firstname' => $employee->firstname,
                     'lastname' => $employee->lastname,
                     'name' => trim($employee->firstname.' '.$employee->lastname),
+                    'phone' => $employee->phone,
                     'pictureBase64' => $pictureStorage->getBase64($employeeId),
                 ];
             })
