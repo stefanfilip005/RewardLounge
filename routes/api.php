@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\EmployeesController;
+use App\Http\Controllers\API\DFEmployeesController;
 use App\Http\Controllers\API\InfoblattController;
 use App\Http\Controllers\API\LogController;
 use App\Http\Controllers\API\RewardsController;
@@ -119,6 +120,7 @@ Route::middleware('auth:sanctum', 'log.pageview', 'access:is.moderator')->group(
  * ----------------------------------------------------------------
  */
 Route::middleware('auth:sanctum', 'log.pageview', 'access:is.dienstfuehrer')->group(function () {
+    Route::get("df-employees", DFEmployeesController::class);
     Route::apiResource("employees", EmployeesController::class)->only(['index','show']);
     Route::get("employee-shift-counts", EmployeeShiftCountController::class);
     Route::get("shiftsForEmployee", [EmployeesController::class, 'shiftsForEmployee']);
